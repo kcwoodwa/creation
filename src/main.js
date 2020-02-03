@@ -15,7 +15,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 
 Vue.prototype.$rootOfApp = path.join( remote.app.getAppPath(), '..');
 
-//import csv from 'csv-parse/lib/sync'
+
 
 var inventoryData = String(fs.readFileSync( Vue.prototype.$rootOfApp +'\\inventory.csv'));
 var rows = inventoryData.split('\r\n');

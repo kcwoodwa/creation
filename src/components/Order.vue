@@ -5,7 +5,7 @@
       <b>{{name + ((company && company!== null) ? ' - ' +company : '') + ' - #'+ orderNumber }}</b>
     </div>
     <Label
-      v-bind:key="name.toString()+item.name+printedLabels"
+      v-bind:key="name.toString()+item.name"
       v-for="(item, index) in items"
       :name="item.name"
       :orderNumber="name.toString()"
@@ -122,7 +122,7 @@ export default {
      
       var current = this.printedLabels ? this.printedLabels : "";
       current = this.encryptThenAuthenticate(printedLabels + current);
-      this.printedLabels = printedLabels + current
+      
       this.orderObject.advancedOptions.customField1 = current;
 
       req.write(JSON.stringify(this.orderObject));
