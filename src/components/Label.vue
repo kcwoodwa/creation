@@ -8,14 +8,40 @@
 
 <script>
 
-
+ import fs from 'fs' 
 export default {
   created() {
-    this.$emit("addToWeight", this.itemObject['sku'].toString());
+    //this.$emit("addToWeight", this.itemObject['sku'].toString());
     this.hidden = true;
+
+
+    //test block
+    
+   
+    var orderNames = fs.readFileSync(this.$rootOfApp+'\\test.txt').toString().split('\r\n');
+    for(var order in orderNames){
+    this.name = orderNames[order];
+    this.hidden = true;
+        this.coffee = ''
+      this.size = ''
+      this.grind ='' 
+
+ this.name = this.name.includes("REO Joe Custom") ? this.name+" Size: 5lb" : this.name;
+ this.name = this.name.includes("Paddock House Blend - 5 lb") ? this.name+this.name.replace('- 5 lb', 'Size: 5lb'): this.name;
+ this.name = this.name.includes("Blend for Shinola")? this.name+" Size: 12oz" : this.name;
+this.name = this.name.includes("Blue Owl Cold Brew")? this.name+" Size: 5lb" : this.name;
+//this.name.includes("Cold Brew Coffee Size: 3 L - 5:1 Concentrate BIB
+//this.name.includes("Cold Brew Coffee Size: 7 Gallon - Ready to Drink
+//this.name.includes("Harvest 8 oz. Bags Type: Costa Rica La Pastora"
   
-    this.labelFileName;
-    if (this.name.includes("Grind:")) {
+
+
+
+      
+
+    if (this.name.includes("Grind:")
+   
+    ) {
       this.hidden = false;
 
       //Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
@@ -26,6 +52,7 @@ export default {
     } else if (
       this.name.includes("Ground") ||
       this.name.includes("Whole Bean")
+     
     ) {
       this.hidden = false;
 
@@ -59,8 +86,23 @@ export default {
       this.size = this.name.includes("5 lb") ? "5lb" : "12oz";
       this.grind = this.name.includes("Ground") ? "Ground" : "Whole";
     }
+    else if(    this.name.includes("Size: 5lb") ||
+        this.name.includes("Size: 12oz") ){
+          this.hidden = false;
+
+      //Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
+      this.coffee = this.name.split("Size: ")[0].trim();
+      this.size = this.name.includes("5 lb") ? "5lb" : "12oz";
+      this.grind = this.name.includes("Ground") ? "Ground" : "Whole";
+
+        }
+
+
+    console.log(this.hidden)
     if (this.hidden === false) {
+
       this.labelFileName = this.coffee + this.size + this.grind;
+       this.$print(this.labelFileName)
 
        var regex =  (this.quantity + this.labelFileName).match( /[\dA-Z]/g).join('');
       if (
@@ -70,11 +112,14 @@ export default {
         this.alreadyPrinted = true;
        
         
-        console.debug(regex)
-        this.$emit("addToQuantity",  regex );
+     
+        //this.$emit("addToQuantity",  regex );
+    }
+    }
+    setTimeout(function(){},10000000)
        
         
-    }
+    
     
     //if (false) this.$emit("addToWeight", this.itemObject.sku);
    
