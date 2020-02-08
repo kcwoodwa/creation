@@ -8,7 +8,7 @@
 
 <script>
 
- import fs from 'fs' 
+
 export default {
   created() {
     //this.$emit("addToWeight", this.itemObject['sku'].toString());
@@ -17,14 +17,14 @@ export default {
 
     //test block
     
-   
+   /* 
     var orderNames = fs.readFileSync(this.$rootOfApp+'\\test.txt').toString().split('\r\n');
     for(var order in orderNames){
     this.name = orderNames[order];
     this.hidden = true;
         this.coffee = ''
       this.size = ''
-      this.grind ='' 
+      this.grind =''  */
 
  this.name = this.name.includes("REO Joe Custom") ? this.name+" Size: 5lb" : this.name;
  this.name = this.name.includes("Paddock House Blend - 5 lb") ? this.name+this.name.replace('- 5 lb', 'Size: 5lb'): this.name;
@@ -53,7 +53,7 @@ this.name = this.name.includes("Blue Owl Cold Brew")? this.name+" Size: 5lb" : t
       this.name.includes("Ground") ||
       this.name.includes("Whole Bean")
      
-    ) {
+ ) {
       this.hidden = false;
 
       //Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
@@ -98,11 +98,11 @@ this.name = this.name.includes("Blue Owl Cold Brew")? this.name+" Size: 5lb" : t
         }
 
 
-    console.log(this.hidden)
+   
     if (this.hidden === false) {
 
       this.labelFileName = this.coffee + this.size + this.grind;
-       this.$print(this.labelFileName)
+      
 
        var regex =  (this.quantity + this.labelFileName).match( /[\dA-Z]/g).join('');
       if (
@@ -115,8 +115,7 @@ this.name = this.name.includes("Blue Owl Cold Brew")? this.name+" Size: 5lb" : t
      
         //this.$emit("addToQuantity",  regex );
     }
-    }
-    setTimeout(function(){},10000000)
+
        
         
     
