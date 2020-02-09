@@ -16,7 +16,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 Vue.prototype.$rootOfApp = path.join(remote.app.getAppPath(), '..');
 
 
-
+/* 
 var inventoryData = String(fs.readFileSync(Vue.prototype.$rootOfApp + '\\inventory.csv'));
 var rows = inventoryData.split('\r\n');
 var headers = rows[0].split(',');
@@ -34,7 +34,7 @@ for (let i = 1; i < rows.length; i++) {
 
 Vue.prototype.$inventory = inventory
 
-
+ */
 
 
 import { spawn } from "child_process";
