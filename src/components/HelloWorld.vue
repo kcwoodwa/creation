@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <Order
-      v-bind:key="order.orderNumber +order.billTo.name"
+      v-bind:key="order.orderNumber +order.billTo.name+ order.advancedOptions.customField1"
       v-for="order in Orders"
       :name="order.billTo.name"
       :company="order.billTo.company"
@@ -82,8 +82,20 @@ export default {
               
               //if(first)this.Orders = [];
               for (var order in parsedData.orders) {
+                var orderObject = parsedData.orders[order];
+
+                
+                let count = 0;
                 if(this.$children.filter(function(child){
-                  return child.$vnode.key === parsedData.orders[order].orderNumber +parsedData.orders[order].billTo.name 
+                  if(child.$vnode.key !== orderObject.orderNumber +orderObject.billTo.name + orderObject.advancedOptions.customField1
+                   && child.$vnode.key.includes(orderObject.orderNumber +orderObject.billTo.name)){
+                    self.Orders.splice(count++,1,parsedData.orders[order])
+                    return true;
+                   }
+
+
+
+                  return child.$vnode.key === orderObject.orderNumber +orderObject.billTo.name + orderObject.advancedOptions.customField1
                 }).length === 0)
                   self.Orders.push(parsedData.orders[order]);
        
