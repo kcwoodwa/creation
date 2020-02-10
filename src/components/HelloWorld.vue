@@ -85,11 +85,12 @@ export default {
                 var orderObject = parsedData.orders[order];
 
                 
-                let count = 0;
+                let count = -1;
                 if(this.$children.filter(function(child){
+                  count++
                   if(child.$vnode.key !== orderObject.orderNumber +orderObject.billTo.name + orderObject.advancedOptions.customField1
                    && child.$vnode.key.includes(orderObject.orderNumber +orderObject.billTo.name)){
-                    self.Orders.splice(count++,1,parsedData.orders[order])
+                    self.Orders.splice(count,1,parsedData.orders[order])
                     return true;
                    }
 

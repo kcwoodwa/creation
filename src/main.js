@@ -60,7 +60,7 @@ var embedFontAndMeasureText = async function (labelFileName, grindType) {
 
 
   const existingPdfBytes = fs.readFileSync(
-	path.join(__dirname, '..',folder, labelFileName + '.pdf')
+	path.join(Vue.prototype.$rootOfApp,folder, labelFileName + '.pdf')
 
   );
 
@@ -209,9 +209,9 @@ page.drawText(today, {
 
   const pdfBytes = await pdfDoc.save();
   fs.writeFile(labelFileName+".pdf", pdfBytes, () => {
-	/* var print = spawn(
+	 var print = spawn(
 	  path.join(remote.app.getAppPath(), '..', 'PDFtoPrinter.exe'),
-	  ["test.pdf", "OneNote"]
+	  [labelFileName+".pdf", "OneNote"]
 	);
 
 	print.stdout.on("data", data => {
@@ -224,9 +224,10 @@ page.drawText(today, {
 	});
 
 	print.on("close", code => {
+		return;
 	  console.log(`child process exited with code ${code}`);
 	});
- */
+ 
   });
 
 }

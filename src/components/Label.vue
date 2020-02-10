@@ -111,10 +111,7 @@ export default {
 				this.grind +
 				(this.grindType === "" ? "" : " - " + this.grindType);
 
-			//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
-			this.coffee = name.split("-")[0].trim();
-			this.size = name.includes("5 lb") ? "5lb" : "12oz";
-			this.grind = name.includes("Ground") ? "Ground" : "Whole";
+	
 			}
 			else if (name.includes("Grind:")) {
 			this.hidden = false;
@@ -163,7 +160,7 @@ export default {
 			//if (false) this.$emit("addToWeight", this.itemObject.sku);
 
 		},
-		print: function() {
+		print: async function() {
 			var regex = (this.quantity + this.labelFileName).match(/[\dA-Z]/g).join("");
 	 
 			
@@ -175,7 +172,7 @@ export default {
 this.alreadyPrinted = true;
 this.$emit("updatePrintedLabels", regex);
 			for (var i = 0; i < this.quantity; i++) {
-				this.$print(this.labelFileName, this.grindType);
+				await this.$print(this.labelFileName, this.grindType);
 			}
 			
 			
