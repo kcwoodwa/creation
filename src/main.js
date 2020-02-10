@@ -82,7 +82,7 @@ var embedFontAndMeasureText = async function (labelFileName, grindType) {
 	labelFileName.includes('Shinola Blend') ||
 	labelFileName.includes('DDD Blend') ||
 	labelFileName.includes('Creation Espresso 12oz') ||
-	labelFileName.includes('Rummel Roast') ||
+	(labelFileName.includes('Rummel Roast') && labelFileName.includes('12oz')) ||
 	labelFileName.includes('Santa Josefita') ||
 	labelFileName.includes('Shinola House Blend') ||
 	labelFileName.includes('Timberwolves Blend') ||
