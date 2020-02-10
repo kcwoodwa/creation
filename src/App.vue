@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" style="display:flex; flex-direction:column" >
     <router-view />
   </div>
 </template>
@@ -19,6 +19,14 @@
   text-align: center;
   color: #2c3e50;
   overflow-x: hidden;
+  width:100%;
+  height: 100%;
+  position: relative;
+   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 5000px;
+  width: 100%
   
 }
 
@@ -31,57 +39,72 @@
   color: #2c3e50;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+div{
+  flex-direction: column;
+  display:flex;
+  width: 100%;
+  height: auto;
+  position: relative;
 }
 </style>
 
 <script>
-
+import { remote } from "electron";
+const { Tray, Menu } = remote;
 import path from 'path';
-
+var trayIcon = null;
 
 export default {
-  name: 'App'
-};
-const { remote } = require("electron");
-const { Tray, Menu } = remote;
+  name: 'App',
+  data(){
+    return {
+      
 
-
-
-
-
-
-let trayIcon = new Tray(
-  path.join(
-    remote.app.getAppPath(),'..','png',
-    "Creation Coffee Diamond Logo_White.png"
-  )
+    }
+  },
+  created(){
+    trayIcon = new Tray(
+    path.join(
+      remote.app.getAppPath(),'..','png',
+      "Creation Coffee Diamond Logo_White.png"
+    )
 );
 
+var self = this;
 const trayMenuTemplate = [
-  {
-    label: "Empty Application",
-    enabled: false
-  },
 
   {
-    label: "Settings",
+    label: "Show Hidden Items",
+    type: "checkbox",
     click: function() {
-      console.log("Clicked on settings");
+      self.$store.commit('unhide')
     }
   },
 
   {
-    label: "Help",
+    label: "Exit",
     click: function() {
-      console.log("Clicked on Help");
+      remote.app.isQuiting = true;
+      remote.app.quit()
     }
   }
 ];
 
 let trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
 trayIcon.setContextMenu(trayMenu);
+
+
+  }
+};
+
+
+
+
+
+
+
+
+
 
 
 

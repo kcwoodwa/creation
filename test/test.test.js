@@ -1,45 +1,32 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
+/* import { shallowMount } from '@vue/test-utils'
+import MyComponent from '../src/components/Label.vue'
+
+// Mount the component
+const wrapper = shallowMount(MyComponent) */
+
+
 
 var count = 0;
-const { remote } = window.require('electron')
-
-Vue.config.productionTip = false
-
-import path from 'path';
-import fs from 'fs';
-import fetch from 'node-fetch';
-import fontkit from '@pdf-lib/fontkit';
-import { PDFDocument, rgb } from "pdf-lib";
-
-Vue.prototype.$rootOfApp = path.join(remote.app.getAppPath(), '..');
-Vue.prototype.$showHidden = false;
+var path = require('path');
+var fs =require( 'fs')
+var fetch =require( 'node-fetch')
+var fontkit =require( '@pdf-lib/fontkit')
+var { PDFDocument, rgb } =require( "pdf-lib");
 
 
-/* 
-var inventoryData = String(fs.readFileSync(Vue.prototype.$rootOfApp + '\\inventory.csv'));
+
+
+
+var inventoryData = String(fs.readFileSync('..\\inventory - inventory.csv'));
 var rows = inventoryData.split('\r\n');
-var headers = rows[0].split(',');
-
-var inventory = {};
-for (let i = 1; i < rows.length; i++) {
-  var rowData = rows[i].split(',')
-  inventory[rowData[0]] = {};
-
-  for (let j = 1; j < headers.length; j++)
-	inventory[rowData[0]][headers[j]] = rowData[j]
-
-}
 
 
-Vue.prototype.$inventory = inventory
-
- */
 
 
-import { spawn } from "child_process";
+
+
+
+var { spawn } = require( "child_process");
 var embedFontAndMeasureText = async function (labelFileName, grindType) {
 	console.log(grindType)
 
@@ -231,12 +218,127 @@ page.drawText(today, {
 
 }
 
+var parseName = function(name){
+			
+	//test block
+
+/* 
+var orderNames = fs.readFileSync(this.$rootOfApp+'\\test.txt').toString().split('\r\n');
+for(var order in orderNames){
+this.name = orderNames[order];
+this.hidden = true;
+	this.coffee = ''
+this.size = ''
+this.grind =''  */
+
+name = name.includes("REO Joe Custom")
+? name + " Size: 5lb"
+: name;
+name = name.includes("Paddock House Blend - 5 lb")
+? name.replace("- 5 lb", "Size: 5lb")
+: name;
+name = name.includes("Blend for Shinola")
+? name + " Size: 12oz"
+: name;
+
+name = name.includes("Blue Owl Cold Brew")
+? name + " Size: 5lb"
+: name;
+//name.includes("Cold Brew Coffee Size: 3 L - 5:1 Concentrate BIB
+//name.includes("Cold Brew Coffee Size: 7 Gallon - Ready to Drink
+//name.includes("Harvest 8 oz. Bags Type: Costa Rica La Pastora"
+
+this.grindType = name.includes('Coarse') ?   'Coarse': this.grindType;
+this.grindType = name.includes('Espresso') ? 'Espresso': this.grindType;
+this.grindType = name.includes('Fine') ?     'Fine': this.grindType;
 
 
-Vue.prototype.$print = embedFontAndMeasureText;
+if (name.includes("Grind:")) {
+this.hidden = false;
 
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')
+//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
+this.coffee = name.split("Size")[0].trim();
+this.size = name.indexOf("12oz") != -1 ? "12oz" : "";
+this.size = name.indexOf("5lb") != -1 ? "5lb" : this.size;
+this.grind = name.split("Grind:")[1].trim();
+} else if (
+name.includes("Ground") ||
+name.includes("Whole Bean")
+) {
+this.hidden = false;
+
+//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
+this.coffee = name.split("-")[0].trim();
+this.size = name.includes("5 lb") ? "5lb" : "12oz";
+this.grind = name.includes("Ground") ? "Ground" : "Whole";
+} else if (name.includes("Subscription")) {
+this.hidden = false;
+
+this.grind = this.itemObject.options[0].value.includes("Yes")
+	? "Ground"
+	: "Whole";
+this.grindType =
+	this.grind === "Ground"
+		? this.itemObject.options[0].value.split("–")[1]
+		: "";
+this.coffee = this.itemObject.options[1].value;
+this.size = "12oz";
+
+this.computedName =
+	"Subscription: " +
+	this.coffee +
+	" - " +
+	this.grind +
+	(grindType === "" ? "" : " - " + grindType);
+
+//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
+this.coffee = name.split("-")[0].trim();
+this.size = name.includes("5 lb") ? "5lb" : "12oz";
+this.grind = name.includes("Ground") ? "Ground" : "Whole";
+} else if (
+name.includes("Size: 5lb") ||
+name.includes("Size: 12oz")
+) {
+this.hidden = false;
+
+//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
+this.coffee = name.split("Size: ")[0].trim();
+this.size = name.includes("5 lb") ? "5lb" : "12oz";
+this.grind = name.includes("Ground") ? "Ground" : "Whole";
+}
+if (this.hidden === false) {
+this.labelFileName = this.coffee +' '+ this.size +' '+ this.grind;
+
+var regex = (this.quantity + this.labelFileName)
+	.match(/[\dA-Z]/g)
+	.join("");
+if (this.printedLabels && this.printedLabels.includes(regex))
+	this.alreadyPrinted = true;
+
+return {'labelFileName':this.labelFileName, 'grindType': this.grindType}
+
+//this.$emit("addToQuantity",  regex );
+}
+
+//if (false) this.$emit("addToWeight", this.itemObject.sku);
+
+}
+
+for (let row in rows) {
+    
+   
+	var name = rows[row]
+	
+	var stuff =parseName(name);
+	
+	
+	
+      
+            embedFontAndMeasureText(stuff['labelFileName'], stuff['grindType'])
+
+
+
+	
+}
+
+

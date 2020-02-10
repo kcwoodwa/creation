@@ -19,10 +19,13 @@ export default {
 
 <style scoped>
 #CreationLogo{
-  height:100px;
-  width:auto;
+  height:auto;
+  width:250px;
   padding-top: 10px;
   padding-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 20px;
 }
 
 </style>

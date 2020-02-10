@@ -1,9 +1,10 @@
 <template>
-	<div v-show="!this.hidden" class="wrapper">
+	<div v-show="!this.hidden || showHidden" class="wrapper" style="position:relative; display:flex; flex-direction:column">
 		<div class="header">
-			<div id="spacer"></div>
-			<b>{{name + ((company && company!== null) ? ' - ' +company : '') + ' - #'+ orderNumber }}</b>
+	
+			<b>{{name + ((company && company!== null && company!=name) ? ' - ' +company : '') + ' - #'+ orderNumber }}</b>
 		</div>
+		<div style="display:flex; flex-direction:column; position:relative; width:100%; height:100%">
 		<Label
 			v-bind:key="name.toString()+item.name"
 			v-for="(item, index) in items"
@@ -16,12 +17,14 @@
 			:last="index === items.length-1"
 			:printedLabels="getPrintedLabelsFromShipstation()"
 		></Label>
+		</div>
 	</div>
 </template>
 
 
 <script>
 import Label from "@/components/Label.vue";
+import { mapState, mapMutations } from 'vuex';
 
 import http from "http";
 import { compress, decompress } from 'lz-string' 
@@ -61,7 +64,12 @@ export default {
 			printedLabels: "",
 		};
 	},
+	computed: mapState([
+        'showHidden'
+    ]),
+
 	methods: {
+		...mapMutations(['unhide']),
 		getPrintedLabelsFromShipstation: function() {
 			
 			this.printedLabels = this.verifyThenDecrypt(
@@ -126,6 +134,7 @@ export default {
 
 <style scoped>
 .wrapper {
+	position:relative;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
@@ -133,18 +142,14 @@ export default {
 	text-transform: uppercase;
 
 	width: 95%;
-	padding: 6px 10px;
+	padding: 5px;
 
 	margin: 4px;
 }
 
 .header {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	align-items: flex-start;
-	text-transform: uppercase;
-	padding: 2px;
+	display: inline;
+	
 }
 
 #spacer {
