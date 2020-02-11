@@ -211,7 +211,7 @@ page.drawText(today, {
   fs.writeFile(labelFileName+".pdf", pdfBytes, () => {
 	 var print = spawn(
 	  path.join(remote.app.getAppPath(), '..', 'PDFtoPrinter.exe'),
-	  [labelFileName+".pdf", "OneNote"]
+	  folder.includes('5lb') ? [labelFileName+".pdf", "5lb Label Printer"]: [labelFileName+".pdf", "Color Label 500"]
 	);
 
 	print.stdout.on("data", data => {
