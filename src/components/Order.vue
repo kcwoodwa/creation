@@ -9,6 +9,7 @@
 			v-bind:key="name.toString()+item.name"
 			v-for="(item, index) in items"
 			:name="item.name"
+			ref="Label"
 			:orderNumber="name.toString()"
 			:itemObject="item"
 			:quantity="item.quantity"

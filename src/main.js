@@ -3,6 +3,8 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+Vue.prototype.$eventHub = new Vue();
+
 var count = 0;
 const { remote } = window.require('electron')
 
@@ -41,7 +43,6 @@ Vue.prototype.$inventory = inventory
 
 import { spawn } from "child_process";
 var embedFontAndMeasureText = async function (labelFileName, grindType) {
-	console.log(grindType)
 
 
   const url =

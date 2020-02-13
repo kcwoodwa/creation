@@ -54,6 +54,10 @@ const { Tray, Menu } = remote;
 import path from 'path';
 var trayIcon = null;
 
+import {bus} from "../src/main.js"
+// Where you wanna call the child's method:
+
+
 export default {
   name: 'App',
   data(){
@@ -80,7 +84,14 @@ const trayMenuTemplate = [
       self.$store.commit('unhide')
     }
   },
+ /*  {
+    label: "Print Retail Labels",
+    click: function() {
+   
 
+    }
+  },
+ */
   {
     label: "Exit",
     click: function() {

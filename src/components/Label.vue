@@ -1,7 +1,7 @@
 <template>
 	<div v-show="!hidden || showHidden" style="padding:5px">
 	
-	<div :class="'printed'+alreadyPrinted+' button '"  v-on:click="print()">
+	<div :class="'printed'+alreadyPrinted+' button '"  @printMyChild="print()" v-on:click="print()">
 		{{ quantity + " × " }}
 		{{ computedName }}
 	</div>
@@ -11,7 +11,13 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
+import {bus} from '../main.js';
+// Add this to the mounted() method in your component options object:
+
 export default {
+	mounted(){
+	
+	},
 	created() {
 		//this.$emit("addToWeight", this.itemObject['sku'].toString());
 		this.hidden = true;
@@ -28,6 +34,8 @@ export default {
 		) {
 			this.$emit("hideOrder");
 		}
+
+		//bus.$on('printMyChild', this.print());
 	},
 	name: "Label",
 	props: {
@@ -89,27 +97,42 @@ export default {
 			//name.includes("Harvest 8 oz. Bags Type: Costa Rica La Pastora"
 
 			this.grindType = name.includes('Coarse') ?   'Coarse': this.grindType;
-			this.grindType = name.includes('Espresso') ? 'Espresso': this.grindType;
+			if((this.name.includes('Diamond Espresso') || name.includes('Creation Espresso')) &&
+			(this.name.toLowerCase().match(/espresso/g) || []).length >= 2)
+				this.grindType = "Espresso";
+			else if(this.grindType = name.includes('Espresso'))
+				this.grindType = "Espresso"
 			this.grindType = name.includes('Fine') ?     'Fine': this.grindType;
 
-			if (name.includes("Subscription")) {
-			this.hidden = false;
+			if (name.includes("Subscription") && this.itemObject.sku.startsWith('SQ')) {
+				this.hidden = false;
 
-			this.grind = this.itemObject.options[0].value.includes("Yes")
-				? "Ground"
-				: "Whole";
-			this.grindType = this.grind === "Ground"
-					? this.itemObject.options[0].value.split("–")[1]
-					: "";
-			this.coffee = this.itemObject.options[1] ? this.itemObject.options[1].value: this.name;
-			this.size = "12oz";
+				this.grind = this.name.includes('Whole') ? 'Whole': this.grind;
+				this.grind = this.name.includes('Ground') ? 'Ground' : this.grind
+				
+	
+				this.coffee = this.name.split('Subscription')[0].trim();
+				this.size = "12oz";
 
-			this.computedName =
-				"Subscription: " +
-				this.coffee +
-				" - " +
-				this.grind +
-				(this.grindType === "" ? "" : " - " + this.grindType);
+			}
+			else if(name.includes("Subscription")){
+				this.hidden = false;
+
+				this.grind = this.itemObject.options[0].value.includes("Yes")
+					? "Ground"
+					: "Whole";
+				this.grindType = this.grind === "Ground"
+						? this.itemObject.options[0].value.split("–")[1]
+						: "";
+				this.coffee = this.itemObject.options[1] ? this.itemObject.options[1].value: this.name;
+				this.size = "12oz";
+
+				this.computedName =
+					"Subscription: " +
+					this.coffee +
+					" - " +
+					this.grind +
+					(this.grindType === "" ? "" : " - " + this.grindType);
 
 	
 			}
@@ -160,6 +183,7 @@ export default {
 			//if (false) this.$emit("addToWeight", this.itemObject.sku);
 
 		},
+
 		print: async function() {
 			var regex = (this.quantity + this.labelFileName).match(/[\dA-Z]/g).join("");
 	 
