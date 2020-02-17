@@ -246,7 +246,7 @@ import { spawn } from "child_process";
 		fs.writeFile(tempName, pdfBytes, () => {
 		   var print = spawn(
 			path.join(remote.app.getAppPath(), '..', 'PDFtoPrinter.exe'),
-			folder.includes('5lb') ? [tempName, "5lb Label Printer"]: [tempName, "OneNote"]
+			folder.includes('5lb') ? [tempName, "Bulk Printer"]: [tempName, "Retail Printer"]
 		  );
 	  
 		  print.stdout.on("data", data => {
