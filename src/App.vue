@@ -59,53 +59,7 @@ import {bus} from "../src/main.js"
 
 
 export default {
-  name: 'App',
-  data(){
-    return {
-      
-
-    }
-  },
-  created(){
-    trayIcon = new Tray(
-    path.join(
-      remote.app.getAppPath(),'..','png',
-      "Creation Coffee Diamond Logo_White.png"
-    )
-);
-
-var self = this;
-const trayMenuTemplate = [
-
-  {
-    label: "Show Hidden Items",
-    type: "checkbox",
-    click: function() {
-      self.$store.commit('unhide')
-    }
-  },
- /*  {
-    label: "Print Retail Labels",
-    click: function() {
-   
-
-    }
-  },
- */
-  {
-    label: "Exit",
-    click: function() {
-      remote.app.isQuiting = true;
-      remote.app.quit()
-    }
-  }
-];
-
-let trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
-trayIcon.setContextMenu(trayMenu);
-
-
-  }
+  name: 'App'
 };
 
 

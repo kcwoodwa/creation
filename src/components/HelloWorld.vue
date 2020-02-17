@@ -13,6 +13,24 @@
 </template>
 
 <script>
+import { remote } from "electron";
+const { Tray, Menu } = remote;
+import path from 'path';
+var trayIcon = null;
+
+// Where you wanna call the child's method:
+
+
+  
+
+
+
+
+
+
+
+
+
 //const LABELS_PRINTED_TAG_ID = 89655;
 const ERROR_PRINTING_TAG_ID = 91038;
 
@@ -29,11 +47,52 @@ const options = {
 
 var active = true;
 
+
 import Order from "@/components/Order.vue";
 import http from 'http'
 
 export default {
   created() {
+      var self = this;
+    
+
+
+
+        trayIcon = new Tray(
+        path.join(
+          remote.app.getAppPath(),'..','png',
+          "Creation Coffee Diamond Logo_White.png"
+        ));
+
+        const trayMenuTemplate = [
+
+      {
+        label: "Show Hidden Items",
+        type: "checkbox",
+        click: function() {
+          self.$store.commit('unhide')
+        }
+      },
+      {
+        label: "Print Retail Labels",
+         click: function(){self.printLabels('12oz')}
+      },
+      {
+        label: "Print Bulk Labels",
+        click: function(){self.printLabels('5lb')}
+      },
+    
+      {
+        label: "Exit",
+        click: function() {
+          remote.app.isQuiting = true;
+          remote.app.quit()
+        }
+      }
+    ];
+
+    let trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+    trayIcon.setContextMenu(trayMenu);
     
     this.refresh();
     
@@ -60,6 +119,34 @@ export default {
       await this.getOrders("/orders?orderStatus=awaiting_payment", true)
       await this.getOrders("/orders?orderStatus=awaiting_shipment");
     },
+    printLabels:function(size){
+        var self = this;
+   
+          self.$children.forEach(async function(child){
+            var regex = ""
+            var promise = new Promise(function(resolve, reject){
+              var count = 0;
+              child.$children.forEach(async function(label){
+                
+                  await label.print(size).then(
+                    function(result){
+                      regex+= result;
+                      count +=1; 
+                      if(count === child.$children.length){
+                        resolve();
+                      }
+                    }
+                  )
+                })
+
+            }) 
+            promise.then(function(result){child.updatePrintedLabels(regex)});
+          });
+
+        
+      
+    },
+
    
     getOrders: async function(path) {
       if (active) {

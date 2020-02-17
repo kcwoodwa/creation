@@ -141,11 +141,12 @@ export default {
 	justify-content: flex-start;
 	align-items: flex-start;
 	text-transform: uppercase;
+	box-sizing: border-box;
 
-	width: 95%;
-	padding: 5px;
+	width: 100%;
+	padding: 15px;
 
-	margin: 4px;
+
 }
 
 .header {

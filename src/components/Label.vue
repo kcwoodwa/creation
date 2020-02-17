@@ -1,24 +1,33 @@
 <template>
 	<div v-show="!hidden || showHidden" style="padding:5px">
 	
-	<div :class="'printed'+alreadyPrinted+' button '"  @printMyChild="print()" v-on:click="print()">
-		{{ quantity + " × " }}
-		{{ computedName }}
-	</div>
+		<div :class="'printed'+alreadyPrinted+' button '"  v-on:click="print(undefined)" @contextmenu="openMenu">
+			{{ quantity + " × " }}
+			{{ computedName }}
+			 <ul id="right-click-menu" tabindex="-1" ref="right" v-show="viewMenu" @mouseout="closeMenu" @blur="closeMenu"  v-bind:style="{top:top, left:left}">
+			<li v-on:click="print(undefined, true)">Print Once</li>
+			</ul>
+		</div>
+		 
 	</div>
 	
 </template>
 
 <script>
+
 import { mapState, mapMutations } from 'vuex';
 import {bus} from '../main.js';
 // Add this to the mounted() method in your component options object:
 
+
 export default {
 	mounted(){
+		
 	
 	},
 	created() {
+		
+	
 		//this.$emit("addToWeight", this.itemObject['sku'].toString());
 		this.hidden = true;
 
@@ -35,7 +44,6 @@ export default {
 			this.$emit("hideOrder");
 		}
 
-		//bus.$on('printMyChild', this.print());
 	},
 	name: "Label",
 	props: {
@@ -57,7 +65,11 @@ export default {
 			grind: "",
 			grindType: "",
 			coffee: "",
-			bestBy: true
+			bestBy: true,
+			viewMenu: false,
+			shortenedName: '',
+        	top: '0px',
+        	left: '0px'
 		};
 	},
 	computed: mapState([
@@ -65,19 +77,38 @@ export default {
     ]),
 
 	methods: {
+		setMenu: function(top, left) {
+          
+         /*    var largestHeight = window.innerHeight - this.$refs.right.offsetHeight - 25;
+            var largestWidth = window.innerWidth - this.$refs.right.offsetWidth - 25;
+
+            if (top > largestHeight) top = largestHeight;
+
+            if (left > largestWidth) left = largestWidth;
+ */
+            this.top = top-15+ 'px';
+            this.left = left-25 + 'px';
+        },
+
+        closeMenu: function() {
+            this.viewMenu = false;
+        },
+
+        openMenu: function(e) {
+            this.viewMenu = true;
+
+            this.$nextTick(function() {
+                this.$refs.right.focus();
+
+                this.setMenu(e.y, e.x)
+            }.bind(this));
+            e.preventDefault();
+        },
 		...mapMutations(['unhide']),
 		parseName :function(name){
 						
-				//test block
-
-			/* 
-			var orderNames = fs.readFileSync(this.$rootOfApp+'\\test.txt').toString().split('\r\n');
-			for(var order in orderNames){
-			this.name = orderNames[order];
-			this.hidden = true;
-				this.coffee = ''
-			this.size = ''
-			this.grind =''  */
+			
+				
 
 			name = name.includes("REO Joe Custom")
 			? name + " Size: 5lb"
@@ -95,14 +126,18 @@ export default {
 			//name.includes("Cold Brew Coffee Size: 3 L - 5:1 Concentrate BIB
 			//name.includes("Cold Brew Coffee Size: 7 Gallon - Ready to Drink
 			//name.includes("Harvest 8 oz. Bags Type: Costa Rica La Pastora"
+	
 
 			this.grindType = name.includes('Coarse') ?   'Coarse': this.grindType;
-			if((this.name.includes('Diamond Espresso') || name.includes('Creation Espresso')) &&
-			(this.name.toLowerCase().match(/espresso/g) || []).length >= 2)
-				this.grindType = "Espresso";
-			else if(this.grindType = name.includes('Espresso'))
-				this.grindType = "Espresso"
 			this.grindType = name.includes('Fine') ?     'Fine': this.grindType;
+			this.grindType = name.includes('Espresso') ?     'Espresso': this.grindType;
+
+			if(this.name.includes('Diamond Espresso') || this.name.includes('Creation Espresso')){
+				this.grindType  = (name.toLowerCase().match(/espresso/g) || []).length >= 2 ? 'Espresso' : '';
+			}
+
+			
+		
 
 			if (name.includes("Subscription") && this.itemObject.sku.startsWith('SQ')) {
 				this.hidden = false;
@@ -131,33 +166,43 @@ export default {
 					"Subscription: " +
 					this.coffee +
 					" - " +
+					this.size +
+					" - "
 					this.grind +
 					(this.grindType === "" ? "" : " - " + this.grindType);
 
 	
 			}
 			else if (name.includes("Grind:")) {
-			this.hidden = false;
+				this.hidden = false;
 
-			//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
-			this.coffee = name.split("Size")[0].trim();
-			this.size = name.indexOf("12oz") != -1 ? "12oz" : "";
-			this.size = name.indexOf("5lb") != -1 ? "5lb" : this.size;
-			this.grind = name.split("Grind:")[1].trim();
+				//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
+				this.coffee = name.split("Size")[0].trim();
+				this.size = name.indexOf("12oz") != -1 ? "12oz" : "";
+				this.size = name.indexOf("5lb") != -1 ? "5lb" : this.size;
+				this.grind = name.split("Grind:")[1].trim();
 			} else if (
-			name.includes("Ground") ||
-			name.includes("Whole Bean")
+				name.includes("Ground") ||
+				name.includes("Whole Bean")
 			) {
-			this.hidden = false;
+				this.hidden = false;
 
-			//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
-			this.coffee = name.split("-")[0].trim();
-			this.size = name.includes("5 lb") ? "5lb" : "12oz";
-			this.grind = name.includes("Ground") ? "Ground" : "Whole";
+				//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
+				this.coffee = name.split("-")[0].trim();
+				this.size = name.includes("5 lb") ? "5lb" : "12oz";
+				this.grind = name.includes("Ground") ? "Ground" : "Whole";
+
+				this.computedName =
+					this.coffee +
+					" - " +
+					this.size +
+					" - " +
+					this.grind +
+					(this.grindType === "" ? "" : " - " + this.grindType);
 			
 			} else if (
-			name.includes("Size: 5lb") ||
-			name.includes("Size: 12oz")
+				name.includes("Size: 5lb") ||
+				name.includes("Size: 12oz")
 			) {
 			this.hidden = false;
 
@@ -167,15 +212,15 @@ export default {
 			this.grind = name.includes("Ground") ? "Ground" : "Whole";
 			}
 			if (this.hidden === false) {
-			this.labelFileName = this.coffee +' '+ this.size +' '+ this.grind;
+				this.labelFileName = this.coffee +' '+ this.size +' '+ this.grind;
 
-			var regex = (this.quantity + this.labelFileName)
-				.match(/[\dA-Z]/g)
-				.join("");
-			if (this.printedLabels && this.printedLabels.includes(regex))
-				this.alreadyPrinted = true;
+				this.shortenedName = (this.quantity + this.labelFileName)
+					.match(/[\dA-Z]/g)
+					.join("");
+				if (this.printedLabels && this.printedLabels.includes(this.shortenedName))
+					this.alreadyPrinted = true;
 
-			return {'labelFileName':this.labelFileName, 'grindType': this.grindType}
+				return {'labelFileName':this.labelFileName, 'grindType': this.grindType}
 
 			//this.$emit("addToQuantity",  regex );
 			}
@@ -184,22 +229,39 @@ export default {
 
 		},
 
-		print: async function() {
-			var regex = (this.quantity + this.labelFileName).match(/[\dA-Z]/g).join("");
-	 
-			
-			/* var printerName =
-				this.size === " 12oz " ? "RETAIL PRINTER" : "BULK PRINTER";
-			var driverName = this.size === " 12oz " ? "RETAIL DRIVEr" : "BULK DRIVER";
-			var port = this.size === " 12oz " ? "RETAIL PORT" : "BULK PORT"; */
+		print: async function(retailOrBulk, forcePrintSingle) {
+			var $this = this;
+			if(name.includes("Live Oak Blend") && name.includes('12oz')){
+				return;
+			}
 
-this.alreadyPrinted = true;
-this.$emit("updatePrintedLabels", regex);
-			for (var i = 0; i < this.quantity; i++) {
-				await this.$print(this.labelFileName, this.grindType);
+			return new Promise(async function(resolve, reject){
+
+			var count = forcePrintSingle ?  1 :$this.quantity;
+			
+	
+
+			if(($this.alreadyPrinted === false || forcePrintSingle) && ( retailOrBulk === undefined || (retailOrBulk && $this.size === retailOrBulk))){
+			
+			
+
+					$this.alreadyPrinted = true;
+					if(retailOrBulk === undefined) $this.$emit("updatePrintedLabels", $this.shortenedName);
+					
+					
+					for (var i = 0; i < count; i++) {
+						await $this.$print($this.labelFileName, $this.grindType).then(result=>{
+							resolve( $this.shortenedName);
+						});
+					}
+					
+				}
+			
+			else{
+				resolve('')
 			}
 			
-			
+		})
 		}
 	}
 };
@@ -207,6 +269,35 @@ this.$emit("updatePrintedLabels", regex);
 
 <style lang="scss">
 
+#right-click-menu{
+	font-size: 10px;
+    background: #FAFAFA;
+    border: 1px solid #BDBDBD;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+    display: block;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    width: 130px;
+    z-index: 999999;
+	color:black;
+}
+
+#right-click-menu li {
+    border-bottom: 1px solid #E0E0E0;
+    margin: 0;
+    padding: 3px 20px;
+}
+
+#right-click-menu li:last-child {
+    border-bottom: none;
+}
+
+#right-click-menu li:hover {
+    background: #1E88E5;
+    color: #FAFAFA;
+}
 
 .d{
   display:flex;
@@ -223,7 +314,7 @@ this.$emit("updatePrintedLabels", regex);
 %test {
   position: absolute;
 	content: '';
-	transition: all .15s ;
+	transition: all .22s ;
 }
 
 $buttonPressInDistance:3px;
@@ -232,17 +323,16 @@ $buttonPressInDistance:3px;
 	padding: 5px 5px;
 	color: white;
 	position: relative;
-	left: 2%;
+	left: 5px;
 	line-height: 1.5;
 	height:17px;
-	width:98%;
+	width:99%;
 	cursor: pointer;
-	
-	vertical-align: middle;
+
 
 	font-size: 12px;
   //	box-shadow: inset 0 0 0 1px white;
-	transition: all .15s;
+	transition: all .22s;
 	background-color:lighten(black,60%);
 
 	$buttonThickness:8px;
