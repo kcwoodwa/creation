@@ -171,20 +171,19 @@ export default {
               for (var order in parsedData.orders) {
                 var orderObject = parsedData.orders[order];
 
-                
+                var key;
                 let count = -1;
-                if(this.$children.filter(function(child){
-                  count++
-                  if(child.$vnode.key !== orderObject.orderNumber +orderObject.billTo.name + orderObject.advancedOptions.customField1
-                   && child.$vnode.key.includes(orderObject.orderNumber +orderObject.billTo.name)){
-                    self.Orders.splice(count,1,parsedData.orders[order])
-                    return true;
-                   }
+                var exists = false;
+                self.Orders.forEach(function(order){
+                  count++;
+                  var key = order.orderNumber + order.billTo.name;
+                  if(orderObject.orderNumber +orderObject.billTo.name === key){
+                      self.Orders.splice(count,1,orderObject)
+                      exists = true;
+                  }
+                })
 
-
-
-                  return child.$vnode.key === orderObject.orderNumber +orderObject.billTo.name + orderObject.advancedOptions.customField1
-                }).length === 0)
+                if(exists === false)
                   self.Orders.push(parsedData.orders[order]);
        
                 }

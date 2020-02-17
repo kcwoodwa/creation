@@ -252,7 +252,7 @@ export default {
 					for (var i = 0; i < count; i++) {
 						await $this.$print($this.labelFileName, $this.grindType).then(result=>{
 							resolve( $this.shortenedName);
-						});
+						}, fail=>{console.error($this.labelFileName)});
 					}
 					
 				}
