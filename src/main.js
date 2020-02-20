@@ -83,7 +83,8 @@ import { spawn } from "child_process";
 	  
 		pdfDoc.registerFontkit(fontkit);
 
-		const url = Vue.prototype.$rootOfApp + '\\Gotham Extra Light.otf'
+	//	const url = Vue.prototype.$rootOfApp + '\\Gotham Extra Light.otf'
+	//	const fontBytes = await fetch(url).then(res => res.arrayBuffer());
 		const fontBytes = fs.readFileSync(Vue.prototype.$rootOfApp + '\\Gotham Extra Light.otf');
 
 	const customFont = await pdfDoc.embedFont(fontBytes);
