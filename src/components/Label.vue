@@ -245,14 +245,19 @@ export default {
 			
 			
 
-					$this.alreadyPrinted = true;
-					if(retailOrBulk === undefined) $this.$emit("updatePrintedLabels", $this.shortenedName);
+				
 					
 					
 					for (var i = 0; i < count; i++) {
 						await $this.$print($this.labelFileName, $this.grindType).then(result=>{
+							$this.alreadyPrinted = true;
+							if(retailOrBulk === undefined) $this.$emit("updatePrintedLabels", $this.shortenedName);
 							resolve( $this.shortenedName);
-						}, fail=>{console.error($this.labelFileName)});
+						}, fail=>{
+							reject('Error Printing ' +$this.labelFileName )
+							 alert('Error Printing ' +$this.labelFileName );
+							console.error($this.labelFileName)
+						});
 					}
 					
 				}

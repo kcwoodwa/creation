@@ -72,10 +72,7 @@ import { spawn } from "child_process";
 	  
 		);
 	  
-	  } catch (err) {
-		  console.error(err)
-		  resolve('fail')
-	  }
+	
 	  
 		// Load a PDFDocument require( the existing PDF bytes
 	  
@@ -267,7 +264,10 @@ import { spawn } from "child_process";
 	
 	  
 	  });
-
+	} catch (err) {
+		console.error(err)
+		reject('fail')
+	}
 
 });
 	}

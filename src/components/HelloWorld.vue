@@ -135,6 +135,12 @@ export default {
                       if(count === child.$children.length){
                         resolve();
                       }
+                    },
+                    function(fail){
+                      count +=1; 
+                      if(count === child.$children.length){
+                        resolve();
+                      }
                     }
                   )
                 })
