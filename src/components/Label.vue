@@ -125,9 +125,9 @@ export default {
 			? name + " Size: 12oz"
 			: name;
 
-			name = name.includes("Blue Owl Cold Brew")
-			? name + " Size: 5lb"
-			: name;
+
+
+			
 			//name.includes("Cold Brew Coffee Size: 3 L - 5:1 Concentrate BIB
 			//name.includes("Cold Brew Coffee Size: 7 Gallon - Ready to Drink
 			//name.includes("Harvest 8 oz. Bags Type: Costa Rica La Pastora"
@@ -218,6 +218,7 @@ export default {
 			this.coffee = name.split("Size: ")[0].trim();
 			this.size = name.includes("5 lb") ? "5lb" : "12oz";
 			this.grind = name.includes("Ground") ? "Ground" : "Whole";
+			this.grind = name.includes("DDD House Blend") ? "Whole" : this.grind;
 			}
 			if (this.hidden === false) {
 				this.labelFileName = this.coffee +' '+ this.size +' '+ this.grind;

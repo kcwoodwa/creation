@@ -135,7 +135,7 @@ var checkIfPrintable = function(labelFileName){
 	  labelFileName.includes('Upstream Blend'))
 	  color = rgb(1, 1, 1);
   
-	if (labelFileName.includes('Iron Grind House Blend'))
+	if (labelFileName.includes('Iron Grind House Blend') &&  labelFileName.includes('12oz'))
 	  color = rgb(1, 0, 0);
 
 	//disable date
@@ -229,7 +229,7 @@ var checkIfPrintable = function(labelFileName){
 	) {
 	  RoastedOnBrewByX = 306+5;
 	  RoastedOnBrewByY = 165;
-	  dateX = RoastedOnBrewByX;
+	  dateX = RoastedOnBrewByX-5;
 	  dateY = 187.5+5;
 	  textSize2 = 28;
 	  today = today.split('.')[0] + '/' + today.split('.')[1] 
