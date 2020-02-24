@@ -12,6 +12,7 @@
     "postuninstall": "electron-builder install-app-deps"
   },
   "main": "background.js",
+  "bin": "background.js",
   "dependencies": {
     "@pdf-lib/fontkit": "0.0.4",
     "child_process": "^1.0.2",
