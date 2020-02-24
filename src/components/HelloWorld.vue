@@ -1,8 +1,9 @@
 <template>
   <div class="hello">
     <Order
-      v-bind:key="order.orderNumber +order.billTo.name+ order.advancedOptions.customField1"
+      v-bind:key="order.orderNumber +order.billTo.name+ order.advancedOptions.customField3"
       v-for="order in Orders"
+      :newCustomer="isNewCustomer(order)"
       :name="order.billTo.name"
       :company="order.billTo.company"
       :items="order.items"
@@ -79,7 +80,7 @@ export default {
       },
       {
         label: "Print Bulk Labels",
-        click: function(){self.printLabels('5lb')}
+        click: function(){self.printLabels('5lb8oz')}
       },
     
       {
@@ -93,6 +94,8 @@ export default {
 
     let trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
     trayIcon.setContextMenu(trayMenu);
+    this.getCustomers();
+
     
     this.refresh();
     
@@ -108,16 +111,63 @@ export default {
   
   data: function() {
     return {
-      Orders: []
+      Orders: [],
+      Customers:{}
      
      
     };
   },
   methods: {
     refresh: async function(){
+      var self = this;
+      await this.getOrders("/orders?orderStatus=awaiting_payment", true).then( async function(){
+        await self.getOrders("/orders?orderStatus=awaiting_shipment");
+      });
       
-      await this.getOrders("/orders?orderStatus=awaiting_payment", true)
-      await this.getOrders("/orders?orderStatus=awaiting_shipment");
+    },
+    isNewCustomer:function(orderObject){
+      var self = this;
+      for(let i =0; i < this.Customers.length; i++){
+        var customer = this.Customers[i];
+        if(customer.customerId === orderObject.customerId &&
+        customer.createDate.split('T')[0] === orderObject.createDate.split('T')[0]){
+              return true;
+        }
+      }
+      return false;
+    },
+    getCustomers:function(){
+        options.path = "/customers?sortBy=CreateDate&sortDir=DESC&pageSize=30";
+        options.method = "GET";
+        var self = this;
+        const req = http.get(options, res => {
+          console.debug(`STATUS: ${res.sttausCode}`);
+          console.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
+          res.setEncoding("utf8");
+
+          let rawData = "";
+          res.on("data", chunk => {
+            rawData += chunk;
+          });
+          res.on("end", () => {
+            try {
+              console.debug(rawData)
+              const parsedData = JSON.parse(rawData);
+              
+              self.Customers = parsedData.customers
+              console.log(parsedData)
+            } catch (e) {
+              console.error(e.message);
+           
+            }
+          });
+
+          req.on("error", e => {
+            console.error(`problem with request: ${e.message}`);
+ 
+          });
+        });
+
     },
     printLabels:function(size){
         var self = this;
@@ -155,10 +205,12 @@ export default {
 
    
     getOrders: async function(path) {
+      var self = this;
+      return new Promise(async function(resolve, reject){
       if (active) {
         options.path = path;
         options.method = "GET";
-        var self = this;
+        
         const req = http.get(options, res => {
           console.debug(`STATUS: ${res.sttausCode}`);
           console.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
@@ -193,19 +245,24 @@ export default {
                   self.Orders.push(parsedData.orders[order]);
        
                 }
-              return;
+              resolve();
               
             } catch (e) {
               console.error(e.message);
+              reject();
             }
           });
 
           req.on("error", e => {
             console.error(`problem with request: ${e.message}`);
+            reject()
           });
         });
       }
-    },
+      })
+    }
+    
+    ,
 
     /*  parseOrders(order) {
       order.coffeeItems = [];

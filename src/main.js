@@ -45,17 +45,47 @@ Vue.prototype.$inventory = inventory
 
 import { spawn } from "child_process";
 
+var checkIfPrintable = function(labelFileName){
+	  
+	var folder = ''
+	if(labelFileName.includes('8oz') && labelFileName.includes('Harvest'))
+		folder = '5lb Whole'
+	if (labelFileName.includes('12oz') && labelFileName.includes('Whole'))
+	  folder = '12oz Whole'
+	if (labelFileName.includes('12oz') && labelFileName.includes('Ground'))
+	  folder = '12oz Ground'
+	if (labelFileName.includes('5lb') && labelFileName.includes('Whole'))
+	  folder = '5lb Whole'
+	if (labelFileName.includes('5lb') && labelFileName.includes('Ground'))
+	  folder = '5lb Ground'
+		
+	  var existingPdfBytes;
+  try{
+	 existingPdfBytes = fs.readFileSync(
+	  path.join(Vue.prototype.$rootOfApp,folder, labelFileName + '.pdf'));
+
+	  return true;
+	 }catch(err){
+		 return false;
+	 }
+
+}
+
 
 
 
 	var embedFontAndMeasureText = async function (labelFileName, grindType) {
 		return new Promise(async function(resolve, reject){
 
+			
+
 
 
 		
 	  
 		var folder = ''
+		if(labelFileName.includes('8oz') && labelFileName.includes('Harvest'))
+			folder = '5lb Whole'
 		if (labelFileName.includes('12oz') && labelFileName.includes('Whole'))
 		  folder = '12oz Whole'
 		if (labelFileName.includes('12oz') && labelFileName.includes('Ground'))
@@ -64,7 +94,7 @@ import { spawn } from "child_process";
 		  folder = '5lb Whole'
 		if (labelFileName.includes('5lb') && labelFileName.includes('Ground'))
 		  folder = '5lb Ground'
-	  
+			
 		  var existingPdfBytes;
 	  try{
 		 existingPdfBytes = fs.readFileSync(
@@ -248,7 +278,7 @@ import { spawn } from "child_process";
 		  );
 	  
 		  print.stdout.on("data", data => {
-			console.log(`stdout: ${data}`);
+			console.debug(`stdout: ${data}`);
 		  });
 	  
 		  print.stderr.on("data", data => {
@@ -258,7 +288,7 @@ import { spawn } from "child_process";
 	  
 		  print.on("close", code => {
 			  resolve("success")
-			console.log(`child process exited with code ${code}`);
+			console.debug(`child process exited with code ${code}`);
 		  });
 	   
 	
@@ -276,6 +306,7 @@ import { spawn } from "child_process";
 
 
 Vue.prototype.$print = embedFontAndMeasureText;
+Vue.prototype.$checkIfPrintable = checkIfPrintable;
 
 new Vue({
   router,

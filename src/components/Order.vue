@@ -1,8 +1,10 @@
 <template>
 	<div v-show="!this.hidden || showHidden" class="wrapper" style="position:relative; display:flex; flex-direction:column">
 		<div class="header">
-	
+			<img v-show="newCustomer" id="lightning" alt="bolt" src="../../png/Untitled-2.png">
+
 			<b>{{name + ((company && company!== null && company!=name) ? ' - ' +company : '') + ' - #'+ orderNumber }}</b>
+			<img v-show="newCustomer" id="lightning" alt="bolt" src="../../png/Untitled-3.png">
 		</div>
 		<div style="display:flex; flex-direction:column; position:relative; width:100%; height:100%">
 		<Label
@@ -48,6 +50,7 @@ const options = {
 export default {
 	name: "Order",
 	props: {
+		newCustomer:Boolean,
 		msg: String,
 		name: String,
 		items: Array,
@@ -74,7 +77,7 @@ export default {
 		getPrintedLabelsFromShipstation: function() {
 			
 			this.printedLabels = this.verifyThenDecrypt(
-				this.orderObject.advancedOptions.customField1
+				this.orderObject.advancedOptions.customField3
 			);
 			return this.printedLabels;
 		},
@@ -123,7 +126,9 @@ export default {
 			var current = this.printedLabels ? this.printedLabels : "";
 			current = this.encryptThenAuthenticate(printedLabels + current);
 			
-			this.orderObject.advancedOptions.customField1 = current;
+			this.orderObject.advancedOptions.customField3 = current;
+			if(printedLabels==='reset') 
+				this.orderObject.advancedOptions.customField3 = 'a'
 
 			req.write(JSON.stringify(this.orderObject));
 			req.end();
@@ -144,7 +149,7 @@ export default {
 	box-sizing: border-box;
 
 	width: 100%;
-	padding: 15px;
+	padding: 5px 15px;
 
 
 }
@@ -156,5 +161,11 @@ export default {
 
 #spacer {
 	width: 5px;
+}
+
+#lightning{
+	height: 12px;
+    padding: 0px 7px;
+
 }
 </style>

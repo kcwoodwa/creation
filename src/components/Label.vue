@@ -1,7 +1,8 @@
 <template>
 	<div v-show="!hidden || showHidden" style="padding:5px">
-	
+
 		<div :class="'printed'+alreadyPrinted+' button '"  v-on:click="print(undefined)" @contextmenu="openMenu">
+			<span id="warn" v-if="!validPDF" >&#9940;</span>
 			{{ quantity + " × " }}
 			{{ computedName }}
 			 <ul id="right-click-menu" tabindex="-1" ref="right" v-show="viewMenu" @mouseout="closeMenu" @blur="closeMenu"  v-bind:style="{top:top, left:left}">
@@ -32,6 +33,8 @@ export default {
 		this.hidden = true;
 
 		this.parseName(this.name)
+		this.validPDF = this.$checkIfPrintable(this.labelFileName)
+		
 
 	
 		if (
@@ -69,7 +72,8 @@ export default {
 			viewMenu: false,
 			shortenedName: '',
         	top: '0px',
-        	left: '0px'
+			left: '0px',
+			validPDF: false
 		};
 	},
 	computed: mapState([
@@ -77,6 +81,7 @@ export default {
     ]),
 
 	methods: {
+		
 		setMenu: function(top, left) {
           
          /*    var largestHeight = window.innerHeight - this.$refs.right.offsetHeight - 25;
@@ -139,6 +144,7 @@ export default {
 			
 		
 
+			
 			if (name.includes("Subscription") && this.itemObject.sku.startsWith('SQ')) {
 				this.hidden = false;
 
@@ -167,7 +173,7 @@ export default {
 					this.coffee +
 					" - " +
 					this.size +
-					" - "
+					" - " +
 					this.grind +
 					(this.grindType === "" ? "" : " - " + this.grindType);
 
@@ -180,6 +186,8 @@ export default {
 				this.coffee = name.split("Size")[0].trim();
 				this.size = name.indexOf("12oz") != -1 ? "12oz" : "";
 				this.size = name.indexOf("5lb") != -1 ? "5lb" : this.size;
+				this.size = name.indexOf("8oz") != -1 ? "8oz" : this.size;
+				this.size = name.indexOf("8 oz") != -1 ? "8oz" : this.size;
 				this.grind = name.split("Grind:")[1].trim();
 			} else if (
 				name.includes("Ground") ||
@@ -231,26 +239,27 @@ export default {
 
 		print: async function(retailOrBulk, forcePrintSingle) {
 			var $this = this;
-			if(name.includes("Live Oak Blend") && name.includes('12oz')){
+			if(!this.validPDF)
 				return;
-			}
+
 
 			return new Promise(async function(resolve, reject){
 
 			var count = forcePrintSingle ?  1 :$this.quantity;
 			
 	
-
-			if(($this.alreadyPrinted === false || forcePrintSingle) && ( retailOrBulk === undefined || (retailOrBulk && $this.size === retailOrBulk))){
+		
+			if(($this.alreadyPrinted === false || forcePrintSingle) && ( retailOrBulk === undefined || (retailOrBulk && retailOrBulk.includes($this.size)))){
 			
 			
 
-				
+					$this.alreadyPrinted = true;
+					if(forcePrintSingle) $this.$emit("updatePrintedLabels", 'reset')
 					
 					
 					for (var i = 0; i < count; i++) {
 						await $this.$print($this.labelFileName, $this.grindType).then(result=>{
-							$this.alreadyPrinted = true;
+							
 							if(retailOrBulk === undefined) $this.$emit("updatePrintedLabels", $this.shortenedName);
 							resolve( $this.shortenedName);
 						}, fail=>{
@@ -391,4 +400,8 @@ $buttonPressInDistance:3px;
 	}
 }
 
+
+#warn{
+	display:inline
+}
 </style>
