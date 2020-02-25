@@ -165,7 +165,8 @@ export default {
 				this.grindType = this.grind === "Ground"
 						? this.itemObject.options[0].value.split("–")[1]
 						: "";
-				this.coffee = this.itemObject.options[1] ? this.itemObject.options[1].value: this.name;
+				this.coffee = this.itemObject.options[1] ? this.itemObject.options[1].value.replace(/,/g, '')
+					: this.name;
 				this.size = "12oz";
 
 				this.computedName =
@@ -255,7 +256,7 @@ export default {
 			
 
 					$this.alreadyPrinted = true;
-					if(forcePrintSingle) $this.$emit("updatePrintedLabels", 'reset')
+					//if(forcePrintSingle) $this.$emit("updatePrintedLabels", 'reset')
 					
 					
 					for (var i = 0; i < count; i++) {

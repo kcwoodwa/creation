@@ -20,6 +20,16 @@ import { PDFDocument, rgb } from "pdf-lib";
 
 Vue.prototype.$rootOfApp = path.join(remote.app.getAppPath(), '..');
 Vue.prototype.$showHidden = false;
+var url ;
+	var fontBytes;
+
+const request = async () => {
+    url = "https://raw.githubusercontent.com/mapzen/open/master/assets/fonts/Gotham-Light.ttf";
+	fontBytes = await fetch(url).then(res => res.arrayBuffer());
+}
+
+request();
+
 
 
 /* 
@@ -112,7 +122,7 @@ var checkIfPrintable = function(labelFileName){
 
 	//	const url = Vue.prototype.$rootOfApp + '\\Gotham Extra Light.otf'
 	//	const fontBytes = await fetch(url).then(res => res.arrayBuffer());
-		const fontBytes = fs.readFileSync(Vue.prototype.$rootOfApp + '\\Gotham Extra Light.otf');
+	//	const fontBytes = fs.readFileSync(Vue.prototype.$rootOfApp + '\\Gotham Extra Light.otf');
 
 	const customFont = await pdfDoc.embedFont(fontBytes);
 	var page = pdfDoc.getPages()[0]
