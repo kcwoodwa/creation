@@ -137,7 +137,7 @@ export default {
 			this.grindType = name.includes('Fine') ?     'Fine': this.grindType;
 			this.grindType = name.includes('Espresso') ?     'Espresso': this.grindType;
 
-			if(this.name.includes('Diamond Espresso') || this.name.includes('Creation Espresso')){
+			if(this.name.includes('Diamond Espresso') || this.name.includes('Creation Espresso') || this.name.includes('Iron Grind Espresso')){
 				this.grindType  = (name.toLowerCase().match(/espresso/g) || []).length >= 2 ? 'Espresso' : '';
 			}
 
