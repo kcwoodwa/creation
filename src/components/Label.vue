@@ -1,7 +1,7 @@
 <template>
 	<div v-show="!hidden || showHidden" style="padding:5px">
 
-		<div :class="'printed'+alreadyPrinted+' button '"  v-on:click="print(undefined)" @contextmenu="openMenu">
+		<div :class="'printed'+alreadyPrinted+' button '"  v-on:click.left="print(undefined)" v-on:click.right="openMenu">
 			<span id="warn" v-if="!validPDF" >&#9940;</span>
 			{{ quantity + " × " }}
 			{{ computedName }}
@@ -100,6 +100,8 @@ export default {
         },
 
         openMenu: function(e) {
+			e.preventDefault();
+			e.stopPropagation();
             this.viewMenu = true;
 
             this.$nextTick(function() {
@@ -114,7 +116,7 @@ export default {
 						
 			
 				
-
+/* 
 			name = name.includes("REO Joe Custom")
 			? name + " Size: 5lb"
 			: name;
@@ -123,7 +125,7 @@ export default {
 			: name;
 			name = name.includes("Blend for Shinola")
 			? name + " Size: 12oz"
-			: name;
+			: name; */
 
 
 
@@ -153,6 +155,7 @@ export default {
 				
 	
 				this.coffee = this.name.split('Subscription')[0].trim();
+				this.coffee = this.coffee.toLowerCase().includes('decaf') ? 'Santa Barbara Decaf' : this.coffee;
 				this.size = "12oz";
 
 			}
@@ -185,8 +188,10 @@ export default {
 
 				//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
 				this.coffee = name.split("Size")[0].trim();
-				this.size = name.indexOf("12oz") != -1 ? "12oz" : "";
-				this.size = name.indexOf("5lb") != -1 ? "5lb" : this.size;
+				this.size = name.includes("5lb") ? "5lb" : this.size;
+				this.size = name.includes("5 lb") ? "5lb" : this.size;
+				this.size = name.includes("12oz") ? "12oz" : this.size;
+				this.size = name.includes("12 oz") ? "12oz" : this.size;
 				this.size = name.indexOf("8oz") != -1 ? "8oz" : this.size;
 				this.size = name.indexOf("8 oz") != -1 ? "8oz" : this.size;
 				this.grind = name.split("Grind:")[1].trim();
@@ -210,14 +215,19 @@ export default {
 					(this.grindType === "" ? "" : " - " + this.grindType);
 			
 			} else if (
+				name.includes("Size: 5 lb") ||
 				name.includes("Size: 5lb") ||
-				name.includes("Size: 12oz")
+				name.includes("Size: 12oz") ||
+				name.includes("Size: 12 oz") 
 			) {
 			this.hidden = false;
 
 			//Ethiopia Yirgacheffe Size: 12oz, Grind: Whole
 			this.coffee = name.split("Size: ")[0].trim();
-			this.size = name.includes("5 lb") ? "5lb" : "12oz";
+			this.size = name.includes("5lb") ? "5lb" : this.size;
+			this.size = name.includes("5 lb") ? "5lb" : this.size;
+			this.size = name.includes("12oz") ? "12oz" : this.size;
+			this.size = name.includes("12 oz") ? "12oz" : this.size;
 			this.grind = name.includes("Ground") ? "Ground" : "Whole";
 			this.grind = name.includes("DDD House Blend") ? "Whole" : this.grind;
 			}
@@ -375,9 +385,9 @@ $buttonPressInDistance:3px;
 		transform: skewY(-45deg);
 		background-color: black;
 	}
+	//&:active,
+	&.printedtrue{
 	
-	&.printedtrue,
-	&:active {
     color: lighten(black,80%);
 		margin-left: -$buttonThickness/2.0;
 		margin-top: $buttonThickness/2.0;

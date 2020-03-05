@@ -16,10 +16,14 @@ import fetch from 'node-fetch';
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, rgb } from "pdf-lib";
 
+import PromiseQueue from 'easy-promise-queue';
+
 
 
 Vue.prototype.$rootOfApp = path.join(remote.app.getAppPath(), '..');
 Vue.prototype.$showHidden = false;
+Vue.prototype.$queue = new PromiseQueue({concurrency: 1});
+
 var url ;
 	var fontBytes;
 
@@ -128,7 +132,7 @@ var checkIfPrintable = function(labelFileName){
 	var page = pdfDoc.getPages()[0]
   
   
-	var color = rgb(0, 0, 0);
+	var color = rgb(35/256.0, 35/256.0, 35/256.0);
 	if (labelFileName.includes('Decaf') ||
 	  labelFileName.includes('Kiunyu') ||
 	  labelFileName.includes('Javacology House Blend') ||
@@ -146,7 +150,7 @@ var checkIfPrintable = function(labelFileName){
 	  color = rgb(1, 1, 1);
   
 	if (labelFileName.includes('Iron Grind House Blend') &&  labelFileName.includes('12oz'))
-	  color = rgb(1, 0, 0);
+	  color = rgb(199/256.0, 51/256.0, 44/256.0);
 
 	//disable date
 	var drawDate = true;
@@ -166,7 +170,7 @@ var checkIfPrintable = function(labelFileName){
 	var dd = today.getDate()
 	var mm = today.getMonth() + 1
 	var yy = today.getFullYear()
-	today = mm + '.' + dd + '.' + yy;
+	today = mm + '.' +  + dd + '.' + yy;
   
 	if (labelFileName.includes('Best By')) {
 	  dd = dd > 30 ? 30 : dd;
@@ -175,7 +179,7 @@ var checkIfPrintable = function(labelFileName){
 	}
   
   
-	today = String(mm) + '.' + String(dd) + '.' + String(yy).slice(2);
+	today = String(mm) + '.' + (dd < 10 ? '0': '')+ String(dd) + '.' + String(yy).slice(2);
   
 	var RoastedOnBrewByX;
 	var RoastedOnBrewByY;
@@ -191,24 +195,22 @@ var checkIfPrintable = function(labelFileName){
 	  RoastedOnBrewByY = 166;
 	  dateX = 186;
 	  dateY = RoastedOnBrewByY;
-	  if(grindType && grindType.toLowerCase()== 'espresso'){
-		  grindX = 63+5;
-		  grindY = 177-1;
+		if(labelFileName.includes('Iron Grind House')){
+			RoastedOnBrewByX = 85 ;
+			RoastedOnBrewByY = 164;
+			dateX = 138;
+			dateY = RoastedOnBrewByY;
 		}
-		if(grindType  && grindType.toLowerCase()=='fine'){
-		  grindX = 63+10;
+	
+		  grindX = 63;
 		  grindY = 177-1;
-		}
-		if(grindType  && grindType.toLowerCase() == 'coarse'){
-		  grindX = 63+7;
-		  grindY = 177-1;
-		}
+
 	  
 	}
 	if (labelFileName.includes('5lb')) {
 	  RoastedOnBrewByX = 198 +30;
 	  RoastedOnBrewByY = 204.5;
-	  dateX = 259+30;
+	  dateX = 259+15;
 	  dateY = RoastedOnBrewByY;
 		if(labelFileName.includes('Harvest')){
 			RoastedOnBrewByX = 198 ;
@@ -217,19 +219,19 @@ var checkIfPrintable = function(labelFileName){
 			dateY = RoastedOnBrewByY;
 		}
 
-	  if(grindType  && grindType.toLowerCase()==='espresso'){
+	 
 		  grindX = 148-2;
 		  grindY = 214;
-	  }
-	  if(grindType  && grindType.toLowerCase()==='coarse'){
-		  grindX = 148;
-		  grindY = 214;
-	  }
-	  if(grindType && grindType.toLowerCase()==='fine'){
-		  grindX = 152;
-		  grindY = 214;
-	  }
+	 
 	}
+
+	if (labelFileName.includes('8oz') && labelFileName.includes('Harvest')) {
+		RoastedOnBrewByX = 82;
+		RoastedOnBrewByY = 260;
+		dateX = 144;
+		dateY = RoastedOnBrewByY;
+	}
+
 	var textSize2;
 	if (labelFileName.includes('Live Oak Blend 5lb') ||
 	  labelFileName.includes('Paddock House Blend 5lb') ||
@@ -239,10 +241,10 @@ var checkIfPrintable = function(labelFileName){
 	) {
 	  RoastedOnBrewByX = 306+5;
 	  RoastedOnBrewByY = 165;
-	  dateX = RoastedOnBrewByX-5;
+	  dateX = RoastedOnBrewByX;
 	  dateY = 187.5+5;
 	  textSize2 = 28;
-	  today = today.split('.')[0] + '/' + today.split('.')[1] 
+	  today = today.split('.')[0] + '/' + today.split('.')[1] 	
 	}
   
 	if(drawDate){
@@ -254,6 +256,7 @@ var checkIfPrintable = function(labelFileName){
 		color: color
 		});
 	
+		textWidth = customFont.widthOfTextAtSize(today, textSize2 === undefined ? textSize : textSize2)
 	page.drawText(today, {
 		x: dateX - textWidth / 2.0,
 		y: (page.getSize()['height'] - dateY) - textHeight / 2.0,
@@ -266,7 +269,7 @@ var checkIfPrintable = function(labelFileName){
 	if(grindType==='Coarse'||grindType==='Espresso'||grindType==='Fine'){
 		grindType = grindType.toLowerCase();
 		textSize = 5;
-	   	textWidth = customFont.widthOfTextAtSize(text, textSize)
+	   	textWidth = customFont.widthOfTextAtSize(grindType, textSize)
 	  	textHeight = customFont.heightAtSize(textSize);
 	  	page.drawText(grindType, {
 		  x: grindX - textWidth / 2.0,

@@ -103,35 +103,45 @@ export default {
 
 		},
 		updatePrintedLabels: function(printedLabels) {
-			options.path = "/orders/createorder";
-			options.method = "POST";
-			const req = http.request(options, res => {
-				console.debug(`STATUS: ${res.statusCode}`);
-				console.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
-				res.setEncoding("utf8");
-				res.on("data", chunk => {
-					console.debug(`BODY: ${chunk}`);
-				});
-				res.on("end", () => {
-					console.debug("No more data in response.");
+			var $this = this;
+			this.$queue.add(() => { 
+			return new Promise(function(resolve, reject){
+				options.path = "/orders/createorder";
+				options.method = "POST";
+				const req = http.request(options, res => {
+					console.debug(`STATUS: ${res.statusCode}`);
+					console.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
+					res.setEncoding("utf8");
+					res.on("data", chunk => {
+						console.debug(`BODY: ${chunk}`);
+					});
+					res.on("end", () => {
+						console.log(3)
+						console.debug("No more data in response.");
+						resolve();
 
-				 
+					
+					});
 				});
-			});
 
-			req.on("error", e => {
-				console.error(`problem with request: ${e.message}`);
-			});
-		 
-			var current = this.printedLabels ? this.printedLabels : "";
-			current = this.encryptThenAuthenticate(printedLabels + current);
+				req.on("error", e => {
+					console.error(`problem with request: ${e.message}`);
+					resolve();
+				});
 			
-			this.orderObject.advancedOptions.customField3 = current;
-			if(printedLabels==='reset') 
-				this.orderObject.advancedOptions.customField3 = 'a'
+				var current = $this.printedLabels ? $this.printedLabels : "";
+				current = $this.encryptThenAuthenticate(printedLabels + current);
+				
+				$this.orderObject.advancedOptions.customField3 = current;
+				if(printedLabels==='reset') 
+					$this .orderObject.advancedOptions.customField3 = 'a'
+				console.log($this.orderObject)
+				req.write(JSON.stringify($this.orderObject));
+				req.end();
 
-			req.write(JSON.stringify(this.orderObject));
-			req.end();
+			})
+			})
+		
 		},
 		
 	}

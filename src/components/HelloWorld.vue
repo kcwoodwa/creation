@@ -120,9 +120,10 @@ export default {
   methods: {
     refresh: async function(){
       var self = this;
-      await this.getOrders("/orders?orderStatus=awaiting_payment", true).then( async function(){
+      await  this.getOrders("/orders?shipped&page=1&sortDir=DESC", true);
+     /*   await this.getOrders("/orders?orderStatus=awaiting_payment", true).then( async function(){
         await self.getOrders("/orders?orderStatus=awaiting_shipment");
-      });
+      });  */
       
     },
     isNewCustomer:function(orderObject){
