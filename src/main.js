@@ -130,6 +130,10 @@ var checkIfPrintable = function(labelFileName){
 
 	const customFont = await pdfDoc.embedFont(fontBytes);
 	var page = pdfDoc.getPages()[0]
+
+	if(!labelFileName.includes('Pioneers') && !labelFileName.includes('Maple Grille') 
+&& !labelFileName.includes('Walnut & Park House Blend 12oz')
+		){
   
   
 	var color = rgb(35/256.0, 35/256.0, 35/256.0);
@@ -236,7 +240,7 @@ var checkIfPrintable = function(labelFileName){
 	if (labelFileName.includes('Live Oak Blend 5lb') ||
 	  labelFileName.includes('Paddock House Blend 5lb') ||
 	  labelFileName.includes('Timberwolves Blend 5lb') ||
-	  labelFileName.includes('Reo Joe Custom') ||
+	  labelFileName.includes('REO Joe Custom') ||
 	  labelFileName.includes('Blue Owl Cold Brew')
 	) {
 	  RoastedOnBrewByX = 306+5;
@@ -279,6 +283,7 @@ var checkIfPrintable = function(labelFileName){
 		  color: color
 		});
 	}
+}
   
   
 	
