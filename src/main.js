@@ -150,7 +150,10 @@ var checkIfPrintable = function(labelFileName){
 	  labelFileName.includes('Santa Josefita') ||
 	  labelFileName.includes('Shinola House Blend') ||
 	  labelFileName.includes('Timberwolves Blend') ||
-	  labelFileName.includes('Upstream Blend'))
+	  labelFileName.includes('Upstream Blend')||
+	  labelFileName.includes('505 House Blend 12oz')
+
+	  )
 	  color = rgb(1, 1, 1);
   
 	if (labelFileName.includes('Iron Grind House Blend') &&  labelFileName.includes('12oz'))
@@ -199,7 +202,7 @@ var checkIfPrintable = function(labelFileName){
 	  RoastedOnBrewByY = 166;
 	  dateX = 186;
 	  dateY = RoastedOnBrewByY;
-		if(labelFileName.includes('Iron Grind House')){
+		if(labelFileName.includes('Iron Grind House') || labelFileName.includes('505 House Blend 12oz')){
 			RoastedOnBrewByX = 85 ;
 			RoastedOnBrewByY = 164;
 			dateX = 138;
@@ -216,7 +219,7 @@ var checkIfPrintable = function(labelFileName){
 	  RoastedOnBrewByY = 204.5;
 	  dateX = 259+15;
 	  dateY = RoastedOnBrewByY;
-		if(labelFileName.includes('Harvest')){
+		if(labelFileName.includes('Harvest') || labelFileName.includes('Walnut & Park House Blend 5lb')){
 			RoastedOnBrewByX = 198 ;
 			RoastedOnBrewByY = 162;
 			dateX = 259;
