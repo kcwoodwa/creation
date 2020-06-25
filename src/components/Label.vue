@@ -5,14 +5,16 @@
 			<span id="warn" v-if="!validPDF" >&#9940;</span>
 			{{ quantity + " × " }}
 			{{ computedName }}
-			 <ul id="right-click-menu" tabindex="-1" ref="right" v-show="viewMenu" @mouseout="closeMenu" @blur="closeMenu"  v-bind:style="{top:top, left:left}">
-			<li v-on:click="print(undefined, true)">Print Once</li>
+			 <ul id="right-click-menu" tabindex="-1" ref="right" v-show="viewMenu"  @blur="closeMenu"  v-bind:style="{top:top, left:left}">
+				<li v-on:click="print(undefined, true)">Print Once</li>
+				<li v-on:click="print(undefined, true)"><label for="file-upload" class="custom-file-upload" >Custom Upload</label></li>
 			</ul>
 		</div>
-		 
+		<input id="file-upload" ref="inputFile" type="file" style="display:none"/>
 	</div>
 	
 </template>
+
 
 <script>
 
@@ -23,6 +25,12 @@ import {bus} from '../main.js';
 
 export default {
 	mounted(){
+		const fileSelector = this.$refs.inputFile;
+		console.log(this.$refs)
+		fileSelector.addEventListener('change', (event) => {
+			const fileList = event.target.files;
+			console.log(fileList);
+		});
 		
 	
 	},
@@ -46,6 +54,7 @@ export default {
 		) {
 			this.$emit("hideOrder");
 		}
+		
 
 	},
 	name: "Label",
@@ -415,5 +424,11 @@ $buttonPressInDistance:3px;
 
 #warn{
 	display:inline
+}
+
+.custom-file-upload {
+
+    display: inline-block;
+    cursor: pointer;
 }
 </style>
