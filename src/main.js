@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 
 Vue.prototype.$eventHub = new Vue();
+localStorage.clear();
 
 var count = 0;
 const { remote } = window.require('electron')
@@ -60,6 +61,9 @@ Vue.prototype.$inventory = inventory
 import { spawn } from "child_process";
 
 var checkIfPrintable = function(labelFileName){
+	
+	if(localStorage.getItem(labelFileName))
+		return true
 	  
 	var folder = ''
 	if(labelFileName.includes('8oz') && labelFileName.includes('Harvest'))
@@ -91,11 +95,9 @@ var checkIfPrintable = function(labelFileName){
 	var embedFontAndMeasureText = async function (labelFileName, grindType) {
 		return new Promise(async function(resolve, reject){
 
-			
-
-
-
-		
+			console.log(labelFileName+ grindType)
+	
+	
 	  
 		var folder = ''
 		if(labelFileName.includes('8oz') && labelFileName.includes('Harvest'))
@@ -110,11 +112,8 @@ var checkIfPrintable = function(labelFileName){
 		  folder = '5lb Ground'
 			
 		  var existingPdfBytes;
-	  try{
-		 existingPdfBytes = fs.readFileSync(
-		  path.join(Vue.prototype.$rootOfApp,folder, labelFileName + '.pdf')
-	  
-		);
+		try{
+			existingPdfBytes = fs.readFileSync(path.join(Vue.prototype.$rootOfApp,folder, labelFileName + '.pdf'));
 	  
 	
 	  

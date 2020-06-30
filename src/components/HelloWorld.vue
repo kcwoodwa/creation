@@ -19,6 +19,8 @@ const { Tray, Menu } = remote;
 import path from 'path';
 var trayIcon = null;
 
+import { mapState, mapMutations, mapGetters } from 'vuex';
+
 // Where you wanna call the child's method:
 
 
@@ -108,6 +110,10 @@ export default {
   components: {
     Order
   },
+  computed:{
+    ...mapState(['showHidden','fileLocations'])
+
+  },
   
   data: function() {
     return {
@@ -171,34 +177,74 @@ export default {
 
     },
     printLabels:function(size){
+        var labelsToBePrinted = [];
+        var namesOfLabels =[]
         var self = this;
-   
+          
           self.$children.forEach(async function(child){
             var regex = ""
             var promise = new Promise(function(resolve, reject){
               var count = 0;
               child.$children.forEach(async function(label){
-                
-                  await label.print(size).then(
-                    function(result){
-                      regex+= result;
-                      count +=1; 
-                      if(count === child.$children.length){
-                        resolve();
-                      }
-                    },
-                    function(fail){
-                      count +=1; 
-                      if(count === child.$children.length){
-                        resolve();
-                      }
-                    }
-                  )
-                })
+                if(self.$checkIfPrintable(label.labelFileName)){
+                  labelsToBePrinted.push(label);
+                  namesOfLabels.push(label.labelFileName)
+                }
+                 const functions =labelsToBePrinted.map((label)=>self.$print)
 
-            }) 
+            var i=0;
+            const promiseReduce = (acc, next) => {
+              // we wait for the accumulator to resolve it's promise
+         
+              return acc.then((accResult) => {
+                // and then we return a new promise that will become
+                // the new value for the accumulator
+                return next(namesOfLabels[i++]).then((nextResult) => {
+                  // that eventually will resolve to a new array containing
+                  // the value of the two promises
+                  return accResult.concat(nextResult)
+                })
+              })
+            };
+            // the accumulator will always be a promise that resolves to an array
+            const accumulator = Promise.resolve([])
+
+            // we call reduce with the reduce function and the accumulator initial value
+            functions.reduce(promiseReduce, accumulator)
+              .then((result) => {
+                // let's display the final value here
+                console.log('=== The final result ===')
+                 resolve();
+              })
+            
+
+
+              }) 
+            });
             promise.then(function(result){child.updatePrintedLabels(regex)});
-          });
+          })
+
+           
+
+
+            // await label.print(size).then(
+            //         function(result){
+            //           regex+= result;
+            //           count +=1; 
+            //           if(count === child.$children.length){
+            //             resolve();
+            //           }
+            //         },
+            //         function(fail){
+            //           count +=1; 
+            //           if(count === child.$children.length){
+            //             resolve();
+            //           }
+            //         }
+            //       )
+                
+            //promise.then(function(result){child.updatePrintedLabels(regex)});
+          
 
         
       

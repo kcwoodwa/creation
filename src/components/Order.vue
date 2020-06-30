@@ -18,6 +18,8 @@
 			@hideOrder="hide"
 			@updatePrintedLabels="updatePrintedLabels"
 			:last="index === items.length-1"
+			:fileLocation="getFileLocations.getItem(item.name)"
+		
 			:printedLabels="getPrintedLabelsFromShipstation()"
 		></Label>
 		</div>
@@ -27,7 +29,7 @@
 
 <script>
 import Label from "@/components/Label.vue";
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapGetters } from 'vuex';
 
 import http from "http";
 import { compress, decompress } from 'lz-string' 
@@ -68,18 +70,27 @@ export default {
 			printedLabels: "",
 		};
 	},
-	computed: mapState([
-        'showHidden'
-    ]),
+	computed: {
+		...mapState(['showHidden','fileLocations']),
+		//...mapGetters(['getFileLocations']),
+		getFileLocations:function(){
+			return this.$store.getters.getFileLocations
+		}
+	
+	},
 
 	methods: {
-		...mapMutations(['unhide']),
+		...mapMutations(['unhide','setFileLocation']),
 		getPrintedLabelsFromShipstation: function() {
 			
 			this.printedLabels = this.verifyThenDecrypt(
 				this.orderObject.advancedOptions.customField3
 			);
 			return this.printedLabels;
+		},
+		getFileLocation:function(a){
+			console.log(a)
+			return window.localStorage.getItem(a)
 		},
 
 		hide: function() {

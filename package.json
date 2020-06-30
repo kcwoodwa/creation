@@ -14,14 +14,14 @@
   "main": "background.js",
   "bin": "background.js",
   "dependencies": {
-    "@pdf-lib/fontkit": "0.0.4",
+    "@pdf-lib/fontkit": "1.0.0",
     "child_process": "^1.0.2",
     "core-js": "^3.6.5",
     "easy-promise-queue": "^0.5.7",
     "lz-string": "^1.4.4",
     "node-fetch": "^2.6.0",
-    "pdf-lib": "^1.8.0",
-    "vue": "^2.6.10",
+    "pdf-lib": "^1.9.0",
+    "vue": "^2.6.11",
     "vue-router": "^3.3.4",
     "vuex": "^3.4.0"
   },
@@ -34,11 +34,11 @@
     "babel-eslint": "^10.1.0",
     "compass-mixins": "^0.12.10",
     "electron": "*",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.0.0",
+    "eslint": "^7.3.1",
+    "eslint-plugin-vue": "^6.2.2",
     "sass": "^1.26.9",
     "sass-loader": "^8.0.2",
     "vue-cli-plugin-electron-builder": "^1.4.6",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.11"
   }
 }
