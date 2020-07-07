@@ -25,7 +25,7 @@ export default new Vuex.Store({
     setFileLocation(state, obj){
      
       state.fileLocations.setItem(obj.name, obj.location)
-      state = state;
+
     }
   },
   actions: {
