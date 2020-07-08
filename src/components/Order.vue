@@ -19,6 +19,7 @@
 			@updatePrintedLabels="updatePrintedLabels"
 			:last="index === items.length-1"
 			:fileLocation="getFileLocations.getItem(item.name)"
+			v-on="$listeners"
 		
 			:printedLabels="getPrintedLabelsFromShipstation()"
 		></Label>

@@ -10,9 +10,10 @@
       :items="order.items"
       :orderNumber="order.orderNumber"
       :orderObject="order"
+      @toggle-value="toggleValue"
     ></Order> 
 
-    <input :id="'file-upload'"  type="file" style="display:none"/>
+  
   </div>
 </template>
 
@@ -59,22 +60,7 @@ import http from 'http'
 
 export default {
   mounted(){
-    	const fileSelector = document.getElementById('file-upload') ;
-	
-		var self = this;
-		fileSelector.addEventListener('change', (event) => {
-			const fileList = event.target.files;
-		console.log(event)
-			// window.localStorage.setItem(this.name, fileList[0].path);
-			// console.log(window.localStorage.getItem(this.name))
-			// self.validPDF = self.$checkIfPrintable(this.name)
-		
-			self.$store.commit('setFileLocation', {name: this.name, location:fileList[0].path})
-      self.$nextTick() 
-      self.$forceUpdate()
-			
-		
-		});
+    	
   },
   created() {
       var self = this;
@@ -145,6 +131,7 @@ export default {
     };
   },
   methods: {
+     toggleValue:function() { this.$forceUpdate(); console.log(767)},
     refresh: async function(){
       var self = this;
       //await  this.getOrders("/orders?shipped&page=1&sortDir=DESC", true);

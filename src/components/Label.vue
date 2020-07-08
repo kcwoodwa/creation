@@ -2,16 +2,17 @@
 	<div v-show="!hidden || showHidden" style="padding:5px">
 
 		<div :class="'printed'+alreadyPrinted+' button '"  v-on:click.left="print(undefined)" v-on:click.right="openMenu">
-			<span id="warn" v-if="!this.$store.getters.getFileLocations.getItem(name)" >&#9940;</span>
+			<span id="warn" v-if="!fileLocation" >&#9940;</span>
 			{{ quantity + " × " }}
 			{{ computedName }}
 			
 			
 			 <ul id="right-click-menu" tabindex="-1" ref="right" v-show="viewMenu"  @blur="closeMenu"  v-bind:style="{top:top, left:left}">
 				<li v-on:click="print(undefined, true)">Print Once</li>
-				<li v-on:click="print(undefined, true)"><label :for="'file-upload'" class="custom-file-upload" >Custom Upload</label></li>
+				<li><label :for="'file-upload'+ this._uid" class="custom-file-upload" >Custom Upload</label></li>
 			</ul>
 		</div>
+		<input :id="'file-upload'+ this._uid"  type="file" style="display:none"/>
 		
 	</div>
 	
@@ -28,6 +29,22 @@ import {bus} from '../main.js';
 export default {
 	
 	mounted(){
+		const fileSelector = document.getElementById('file-upload' + this._uid) ;
+	
+		var self = this;
+		fileSelector.addEventListener('change', (event) => {
+			const fileList = event.target.files;
+			console.log(event)
+			// window.localStorage.setItem(this.name, fileList[0].path);
+			// console.log(window.localStorage.getItem(this.name))
+			// self.validPDF = self.$checkIfPrintable(this.name)
+		
+			self.$store.commit('setFileLocation', {name: this.name, location:fileList[0].path})
+			self.$nextTick() 
+			self.$emit('toggle-value')
+					
+		
+		});
 	
 	
 		
@@ -95,7 +112,7 @@ export default {
 	,
 
 	methods: {
-	
+		
 
 		setMenu: function(top, left) {
           
