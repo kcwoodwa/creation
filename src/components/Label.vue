@@ -1,7 +1,7 @@
 <template>
 	<div v-show="!hidden || showHidden" style="padding:5px">
 
-		<div :class="'printed'+alreadyPrinted+' button '"  v-on:click.left="print(undefined)" v-on:click.right="openMenu">
+		<div :class="'printed'+alreadyPrinted+' button '"  v-on:click.left="clickable ? print(undefined):false" v-on:click.right="openMenu">
 			<span id="warn" v-if="!fileLocation" >&#9940;</span>
 			{{ quantity + " × " }}
 			{{ computedName }}
@@ -99,7 +99,8 @@ export default {
 			shortenedName: '',
         	top: '0px',
 			left: '0px',
-			validPDF: false
+			validPDF: false,
+			clickable:true
 		};
 	},
 	computed: {
@@ -128,13 +129,15 @@ export default {
         },
 
         closeMenu: function() {
-            this.viewMenu = false;
+			this.viewMenu = false;
+			this.clickable =true;
         },
 
         openMenu: function(e) {
 			e.preventDefault();
 			e.stopPropagation();
-            this.viewMenu = true;
+			this.viewMenu = true;
+			this.clickable =false;
 
             this.$nextTick(function() {
                 this.$refs.right.focus();

@@ -4,7 +4,7 @@ import router from './router'
 import store from './store'
 
 Vue.prototype.$eventHub = new Vue();
-localStorage.clear();
+
 
 var count = 0;
 const { remote } = window.require('electron')
@@ -89,16 +89,84 @@ var checkIfPrintable = function(labelFileName){
 
 }
 
+var combinePDFs= async function(pdfs){
+	// Create a new PDFDocument
+	const pdfDoc = await PDFDocument.create()
+
+	var existingPdfBytes
+	try{
+		
+
+	
+
+		for(var i =0; i < pdfs.length; i++){
+			firstDonorPdfBytes = fs.readFileSync(pdfs[i]);
+			const firstDonorPdfDoc = await PDFDocument.load(firstDonorPdfBytes)
+			const [firstDonorPage] = await pdfDoc.copyPages(firstDonorPdfDoc, [0])
+			pdfDoc.addPage(firstDonorPage)
+
+		}
+		const pdfBytes = await pdfDoc.save();
+		var tempName = Date.now().toString()+".pdf";
+		fs.writeFile(tempName, pdfBytes, () => {
+			return tempName;
+		});
+
+	} catch (err) {
+		console.error(err)
+		reject('fail')
+	}
+
+	
+}
 
 
+
+	var printPDF = async function(pdfLocation){
+		var tempName = pdfLocation;
+		return new Promise(async function(resolve, reject){
+			var existingPdfBytes
+			try{
+				existingPdfBytes = fs.readFileSync(pdfLocation);
+
+				
+		const pdfDoc = await PDFDocument.load(existingPdfBytes);
+		const {width, height} = pdfDoc.getPages()[0].getSize()
+		console.log('width'+width);
+		console.log('height'+height)
+		  
+
+			var print = spawn(
+				path.join(remote.app.getAppPath(), '..', 'PDFtoPrinter.exe'),
+				true ? [tempName, "Bulk Printer"]: [tempName, "Retail Printer"]
+			  );
+		  
+			  print.stdout.on("data", data => {
+				console.debug(`stdout: ${data}`);
+			  });
+		  
+			  print.stderr.on("data", data => {
+				console.error(`stderr: ${data}`);
+				//this.addTag(this.orderNumber, ERROR_PRINTING_TAG_ID);
+			  });
+		  
+			  print.on("close", code => {
+				  resolve("success")
+				console.debug(`child process exited with code ${code}`);
+			  });
+			} catch (err) {
+				console.error(err)
+				reject('fail')
+			}
+		});
+	
+
+	}
 
 	var embedFontAndMeasureText = async function (labelFileName, grindType) {
 		return new Promise(async function(resolve, reject){
 
-			console.log(labelFileName+ grindType)
 	
-	
-	  
 		var folder = ''
 		if(labelFileName.includes('8oz') && labelFileName.includes('Harvest'))
 			folder = '5lb Whole'
@@ -292,24 +360,8 @@ var checkIfPrintable = function(labelFileName){
 	const pdfBytes = await pdfDoc.save();
 		var tempName = labelFileName+Date.now().toString()+".pdf";
 		fs.writeFile(tempName, pdfBytes, () => {
-		   var print = spawn(
-			path.join(remote.app.getAppPath(), '..', 'PDFtoPrinter.exe'),
-			folder.includes('5lb') ? [tempName, "Bulk Printer"]: [tempName, "Retail Printer"]
-		  );
-	  
-		  print.stdout.on("data", data => {
-			console.debug(`stdout: ${data}`);
-		  });
-	  
-		  print.stderr.on("data", data => {
-			console.error(`stderr: ${data}`);
-			//this.addTag(this.orderNumber, ERROR_PRINTING_TAG_ID);
-		  });
-	  
-		  print.on("close", code => {
-			  resolve("success")
-			console.debug(`child process exited with code ${code}`);
-		  });
+			resolve(tempName)
+		   
 	   
 	
 	  
@@ -325,7 +377,9 @@ var checkIfPrintable = function(labelFileName){
 
 
 
-Vue.prototype.$print = embedFontAndMeasureText;
+Vue.prototype.$print = printPDF;
+Vue.prototype.$generatePDF = embedFontAndMeasureText;
+Vue.prototype.$combinePDFs = combinePDFs;
 Vue.prototype.$checkIfPrintable = checkIfPrintable;
 
 new Vue({
