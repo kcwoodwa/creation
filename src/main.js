@@ -41,7 +41,6 @@ request();
 var inventoryData = String(fs.readFileSync(Vue.prototype.$rootOfApp + '\\inventory.csv'));
 var rows = inventoryData.split('\r\n');
 var headers = rows[0].split(',');
-
 var inventory = {};
 for (let i = 1; i < rows.length; i++) {
   var rowData = rows[i].split(',')
@@ -49,28 +48,23 @@ for (let i = 1; i < rows.length; i++) {
 
   for (let j = 1; j < headers.length; j++)
 	inventory[rowData[0]][headers[j]] = rowData[j]
-
 }
-
-
 Vue.prototype.$inventory = inventory
-
  */
-
 
 import { spawn } from "child_process";
 
 var checkIfPrintable = function(labelFileName){
-	
-	if(localStorage.getItem(labelFileName))
-		return true
+	var local = localStorage.getItem(labelFileName)
+	if(local)
+		return local
 	  
 	var folder = ''
 	if(labelFileName.includes('8oz') && labelFileName.includes('Harvest'))
 		folder = '5lb Whole'
-	if (labelFileName.includes('12oz') && labelFileName.includes('Whole'))
+	if (labelFileName.includes('12oz')  && labelFileName.includes('Whole'))
 	  folder = '12oz Whole'
-	if (labelFileName.includes('12oz') && labelFileName.includes('Ground'))
+	if (labelFileName.includes('12oz')  && labelFileName.includes('Ground'))
 	  folder = '12oz Ground'
 	if (labelFileName.includes('5lb') && labelFileName.includes('Whole'))
 	  folder = '5lb Whole'
@@ -82,7 +76,7 @@ var checkIfPrintable = function(labelFileName){
 	 existingPdfBytes = fs.readFileSync(
 	  path.join(Vue.prototype.$rootOfApp,folder, labelFileName + '.pdf'));
 
-	  return true;
+	  return  path.join(Vue.prototype.$rootOfApp,folder, labelFileName + '.pdf');
 	 }catch(err){
 		 return false;
 	 }
@@ -93,7 +87,7 @@ var combinePDFs= async function(pdfs){
 	// Create a new PDFDocument
 	const pdfDoc = await PDFDocument.create()
 
-	var existingPdfBytes
+	var firstDonorPdfBytes;
 	try{
 		
 
@@ -123,6 +117,7 @@ var combinePDFs= async function(pdfs){
 
 
 	var printPDF = async function(pdfLocation){
+		var size;
 		var tempName = pdfLocation;
 		return new Promise(async function(resolve, reject){
 			var existingPdfBytes
@@ -134,6 +129,12 @@ var combinePDFs= async function(pdfs){
 		const {width, height} = pdfDoc.getPages()[0].getSize()
 		console.log('width'+width);
 		console.log('height'+height)
+
+		if(width+height <405)
+				size = '12oz'
+		if(width+height >=405)
+				size = '5lb'
+
 		  
 
 			var print = spawn(
@@ -167,21 +168,12 @@ var combinePDFs= async function(pdfs){
 		return new Promise(async function(resolve, reject){
 
 	
-		var folder = ''
-		if(labelFileName.includes('8oz') && labelFileName.includes('Harvest'))
-			folder = '5lb Whole'
-		if (labelFileName.includes('12oz') && labelFileName.includes('Whole'))
-		  folder = '12oz Whole'
-		if (labelFileName.includes('12oz') && labelFileName.includes('Ground'))
-		  folder = '12oz Ground'
-		if (labelFileName.includes('5lb') && labelFileName.includes('Whole'))
-		  folder = '5lb Whole'
-		if (labelFileName.includes('5lb') && labelFileName.includes('Ground'))
-		  folder = '5lb Ground'
-			
-		  var existingPdfBytes;
+			var existingPdfBytes
 		try{
-			existingPdfBytes = fs.readFileSync(path.join(Vue.prototype.$rootOfApp,folder, labelFileName + '.pdf'));
+			
+			
+		
+			existingPdfBytes = fs.readFileSync(checkIfPrintable(labelFileName));
 	  
 	
 	  
@@ -197,9 +189,19 @@ var combinePDFs= async function(pdfs){
 
 	const customFont = await pdfDoc.embedFont(fontBytes);
 	var page = pdfDoc.getPages()[0]
+	const {width, height} = pdfDoc.getPages()[0].getSize()
+	console.log('width'+width);
+	console.log('height'+height)
+
+	var size;
+
+	if(width+height <405)
+		size = '12oz'
+	if(width+height >=405)
+		size = '5lb'
 
 	if(!labelFileName.includes('Pioneers') && !labelFileName.includes('Maple Grille') 
-&& !labelFileName.includes('Walnut & Park House Blend 12oz')
+&& !(labelFileName.includes('Walnut & Park House Blend') && size === '12oz')
 		){
   
   
@@ -212,18 +214,18 @@ var combinePDFs= async function(pdfs){
 	  labelFileName.includes('Shinola Blend') ||
 	  labelFileName.includes('Blend for Shinola') ||
 	  labelFileName.includes('DDD Blend') ||
-	  labelFileName.includes('Creation Espresso 12oz') ||
-	  (labelFileName.includes('Rummel Roast') && labelFileName.includes('12oz')) ||
+	  (labelFileName.includes('Creation Espresso')  && size === '12oz') ||
+	  (labelFileName.includes('Rummel Roast') && size === '12oz') ||
 	  labelFileName.includes('Santa Josefita') ||
 	  labelFileName.includes('Shinola House Blend') ||
 	  labelFileName.includes('Timberwolves Blend') ||
 	  labelFileName.includes('Upstream Blend')||
-	  labelFileName.includes('505 House Blend 12oz')
+	  (labelFileName.includes('505 House Blend') && size === '12oz')
 
 	  )
 	  color = rgb(1, 1, 1);
   
-	if (labelFileName.includes('Iron Grind House Blend') &&  labelFileName.includes('12oz'))
+	if (labelFileName.includes('Iron Grind House Blend') &&  size === '12oz')
 	  color = rgb(199/256.0, 51/256.0, 44/256.0);
 
 	//disable date
@@ -264,12 +266,12 @@ var combinePDFs= async function(pdfs){
 
 
   
-	if (labelFileName.includes('12oz')) {
+	if (size ==='12oz') {
 	  RoastedOnBrewByX = 131;
 	  RoastedOnBrewByY = 166;
 	  dateX = 186;
 	  dateY = RoastedOnBrewByY;
-		if(labelFileName.includes('Iron Grind House') || labelFileName.includes('505 House Blend 12oz')){
+		if(labelFileName.includes('Iron Grind House') || (labelFileName.includes('505 House Blend') && size ==='12oz')){
 			RoastedOnBrewByX = 85 ;
 			RoastedOnBrewByY = 164;
 			dateX = 138;
@@ -281,12 +283,12 @@ var combinePDFs= async function(pdfs){
 
 	  
 	}
-	if (labelFileName.includes('5lb')) {
+	if (size === '5lb') {
 	  RoastedOnBrewByX = 198 +30;
 	  RoastedOnBrewByY = 204.5;
 	  dateX = 259+15;
 	  dateY = RoastedOnBrewByY;
-		if(labelFileName.includes('Harvest') || labelFileName.includes('Walnut & Park House Blend 5lb')){
+		if(labelFileName.includes('Harvest') || (labelFileName.includes('Walnut & Park House Blend') && size==='5lb')){
 			RoastedOnBrewByX = 198 ;
 			RoastedOnBrewByY = 162;
 			dateX = 259;
@@ -307,9 +309,9 @@ var combinePDFs= async function(pdfs){
 	}
 
 	var textSize2;
-	if (labelFileName.includes('Live Oak Blend 5lb') ||
-	  labelFileName.includes('Paddock House Blend 5lb') ||
-	  labelFileName.includes('Timberwolves Blend 5lb') ||
+	if ((labelFileName.includes('Live Oak Blend') && size === '5lb') ||
+	  (labelFileName.includes('Paddock House Blend') && size === '5lb') ||
+	  (labelFileName.includes('Timberwolves Blend') && size === '5lb') ||
 	  labelFileName.includes('REO Joe Custom') ||
 	  labelFileName.includes('Blue Owl Cold Brew')
 	) {

@@ -57,7 +57,7 @@ export default {
 		this.hidden = true;
 
 		this.parseName(this.name)
-		this.validPDF = this.$checkIfPrintable(this.labelFileName)
+		//this.validPDF = this.$checkIfPrintable(this.labelFileName)
 		
 
 	
@@ -109,8 +109,8 @@ export default {
 		'fileLocations'
 	]),
 	 ...mapGetters(['getFileLocations'])
-	}
-	,
+	},
+
 
 	methods: {
 		
@@ -194,7 +194,7 @@ export default {
 				this.size = "12oz";
 
 			}
-			else if(name.includes("Subscription")){
+			else if(name.includes("Subscription") && !name.includes("New Subscription")){
 				this.hidden = false;
 
 				this.grind = this.itemObject.options[0].value.includes("Yes")
@@ -284,13 +284,14 @@ export default {
 
 		},
 
-		print: async function(retailOrBulk, forcePrintSingle) {
+		print: function(retailOrBulk, forcePrintSingle) {
 			var $this = this;
-			if(!this.validPDF)
+		
+			if(!this.fileLocation)
 				return;
 
 
-			return new Promise(async function(resolve, reject){
+			return new Promise(function(resolve, reject){
 
 			var count = forcePrintSingle ?  1 :$this.quantity;
 			
@@ -305,7 +306,8 @@ export default {
 					
 					
 					for (var i = 0; i < count; i++) {
-						await $this.$print($this.labelFileName, $this.grindType).then(result=>{
+							console.log(33)
+						$this.$generatePDF($this.name, $this.grindType).then((result)=> $this.$print(result)).then(result2=>{
 							
 							if(retailOrBulk === undefined) $this.$emit("updatePrintedLabels", $this.shortenedName);
 							resolve( $this.shortenedName);
