@@ -6,6 +6,7 @@
 			<b>{{name + ((company && company!== null && company!=name) ? ' - ' +company : '') + ' - #'+ orderNumber }}</b>
 			<img v-show="newCustomer" id="lightning" alt="bolt" src="../../png/Untitled-3.png">
 		</div>
+		<img id="printButton" src="../../png/printer-icon.png" v-on:click="printOrder()">
 		<div style="display:flex; flex-direction:column; position:relative; width:100%; height:100%">
 		<Label
 			v-bind:key="name.toString()+item.name"
@@ -23,6 +24,7 @@
 		
 			:printedLabels="getPrintedLabelsFromShipstation()"
 		></Label>
+		
 		</div>
 	</div>
 </template>
@@ -81,6 +83,7 @@ export default {
 	},
 
 	methods: {
+		printOrder: function(){console.log(4);this.$emit('printOrder',this)},
 		...mapMutations(['unhide','setFileLocation']),
 		getPrintedLabelsFromShipstation: function() {
 			
@@ -90,7 +93,7 @@ export default {
 			return this.printedLabels;
 		},
 		getFileLocation:function(a){
-			console.log(a)
+
 			return window.localStorage.getItem(a)
 		},
 
@@ -128,7 +131,7 @@ export default {
 						console.debug(`BODY: ${chunk}`);
 					});
 					res.on("end", () => {
-						console.log(3)
+
 						console.debug("No more data in response.");
 						resolve();
 
@@ -147,7 +150,7 @@ export default {
 				$this.orderObject.advancedOptions.customField3 = current;
 				if(printedLabels==='reset') 
 					$this .orderObject.advancedOptions.customField3 = 'a'
-				console.log($this.orderObject)
+
 				req.write(JSON.stringify($this.orderObject));
 				req.end();
 
@@ -188,6 +191,15 @@ export default {
 #lightning{
 	height: 12px;
     padding: 0px 7px;
+
+}
+
+#printButton{
+	right: 0;
+    position: absolute;
+    height: 20px;
+    float: right;
+	padding: 0 5px;
 
 }
 </style>

@@ -10,7 +10,8 @@
       :items="order.items"
       :orderNumber="order.orderNumber"
       :orderObject="order"
-      @toggle-value="toggleValue"
+      @printOrder="printLabels"
+      @force-update="toggleValue"
     ></Order> 
 
   
@@ -131,7 +132,7 @@ export default {
     };
   },
   methods: {
-     toggleValue:function() { this.$forceUpdate(); console.log(767)},
+    toggleValue:function() { this.$forceUpdate();},
     refresh: async function(){
       var self = this;
         //await  this.getOrders("/orders?shipped&page=1&sortDir=DESC", true);
@@ -169,7 +170,7 @@ export default {
               const parsedData = JSON.parse(rawData);
               
               self.Customers = parsedData.customers
-              console.log(parsedData)
+     
             } catch (e) {
               console.error(e.message);
            
@@ -183,21 +184,32 @@ export default {
         });
 
     },
-    printLabels:function(size){
+    printLabels:function(order){
         var labelsToBePrinted = [];
         var namesOfLabels =[]
         var self = this;
-          
-          self.$children.forEach(async function(child){
+
+          var orders;
+          if(order === undefined)
+            orders = self.$children;
+          else 
+            orders = [order];
+  
+          orders.forEach(async function(child){
+            console.log(child)
+  
             var regex = ""
             var promise = new Promise(function(resolve, reject){
               var count = 0;
+              var functions;
               child.$children.forEach(async function(label){
-                if(self.$checkIfPrintable(label.labelFileName)){
+                if(self.$checkIfPrintable(label.name)){
                   labelsToBePrinted.push(label);
-                  namesOfLabels.push(label.labelFileName)
+               
+                  namesOfLabels.push(label.name)
                 }
-                const functions =labelsToBePrinted.map((label)=>self.$print)
+                functions=labelsToBePrinted.map((label)=>self.$generatePDF)
+              }) 
 
             var i=0;
             const promiseReduce = (acc, next) => {
@@ -209,6 +221,7 @@ export default {
                 return next(namesOfLabels[i++]).then((nextResult) => {
                   // that eventually will resolve to a new array containing
                   // the value of the two promises
+                  
                   return accResult.concat(nextResult)
                 })
               })
@@ -219,14 +232,14 @@ export default {
             // we call reduce with the reduce function and the accumulator initial value
             functions.reduce(promiseReduce, accumulator)
               .then((result) => {
-                // let's display the final value here
+                self.$combinePDFs(result)
                 console.log('=== The final result ===')
                  resolve();
               })
             
 
 
-              }) 
+              
             });
             promise.then(function(result){child.updatePrintedLabels(regex)});
           })

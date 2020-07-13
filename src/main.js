@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 
 Vue.prototype.$eventHub = new Vue();
+localStorage.clear();
 
 
 var count = 0;
@@ -29,6 +30,7 @@ var url ;
 	var fontBytes;
 
 const request = async () => {
+	
     url = "https://raw.githubusercontent.com/mapzen/open/master/assets/fonts/Gotham-Light.ttf";
 	fontBytes = await fetch(url).then(res => res.arrayBuffer());
 }
@@ -127,8 +129,7 @@ var combinePDFs= async function(pdfs){
 				
 		const pdfDoc = await PDFDocument.load(existingPdfBytes);
 		const {width, height} = pdfDoc.getPages()[0].getSize()
-		console.log('width'+width);
-		console.log('height'+height)
+
 
 		if(width+height <405)
 				size = '12oz'
@@ -136,7 +137,7 @@ var combinePDFs= async function(pdfs){
 				size = '5lb'
 
 		  
-
+				console.log("trying to print "+ pdfLocation)
 			var print = spawn(
 				path.join(remote.app.getAppPath(), '..', 'PDFtoPrinter.exe'),
 				true ? [tempName, "Bulk Printer"]: [tempName, "Retail Printer"]
@@ -171,7 +172,7 @@ var combinePDFs= async function(pdfs){
 			var existingPdfBytes
 		try{
 			
-			
+
 		
 			existingPdfBytes = fs.readFileSync(checkIfPrintable(labelFileName));
 	  
@@ -190,8 +191,7 @@ var combinePDFs= async function(pdfs){
 	const customFont = await pdfDoc.embedFont(fontBytes);
 	var page = pdfDoc.getPages()[0]
 	const {width, height} = pdfDoc.getPages()[0].getSize()
-	console.log('width'+width);
-	console.log('height'+height)
+
 
 	var size;
 
@@ -325,20 +325,20 @@ var combinePDFs= async function(pdfs){
   
 	if(drawDate){
 		page.drawText(text, {
-		x: RoastedOnBrewByX - textWidth / 2.0,
-		y: (page.getSize()['height'] - RoastedOnBrewByY) - textHeight / 2.0,
-		size: textSize,
-		font: customFont,
-		color: color
+			x: RoastedOnBrewByX - textWidth / 2.0,
+			y: (page.getSize()['height'] - RoastedOnBrewByY) - textHeight / 2.0,
+			size: textSize,
+			font: customFont,
+			color: color
 		});
 	
 		textWidth = customFont.widthOfTextAtSize(today, textSize2 === undefined ? textSize : textSize2)
-	page.drawText(today, {
-		x: dateX - textWidth / 2.0,
-		y: (page.getSize()['height'] - dateY) - textHeight / 2.0,
-		size: textSize2 === undefined ? textSize : textSize2,
-		font: customFont,
-		color: color
+		page.drawText(today, {
+			x: dateX - textWidth / 2.0,
+			y: (page.getSize()['height'] - dateY) - textHeight / 2.0,
+			size: textSize2 === undefined ? textSize : textSize2,
+			font: customFont,
+			color: color
 		});
 	}
   
@@ -360,8 +360,10 @@ var combinePDFs= async function(pdfs){
   
 	
 	const pdfBytes = await pdfDoc.save();
+
 		var tempName = labelFileName+Date.now().toString()+".pdf";
 		fs.writeFile(tempName, pdfBytes, () => {
+			console.log(tempName)
 			resolve(tempName)
 		   
 	   
