@@ -174,41 +174,37 @@ export default {
 			if(!this.fileLocation)
 				return;
 
-
 			return new Promise(function(resolve, reject){
 
-			var count = forcePrintSingle ?  1 :$this.quantity;
-			
-	
-		
-			if(($this.alreadyPrinted === false || forcePrintSingle) && ( retailOrBulk === undefined || (retailOrBulk && retailOrBulk.includes($this.size)))){
-			
-			
+				var count = forcePrintSingle ?  1 :$this.quantity;
+				
+				if(($this.alreadyPrinted === false || forcePrintSingle) && ( retailOrBulk === undefined || (retailOrBulk && retailOrBulk.includes($this.size)))){
 
 					$this.alreadyPrinted = true;
-					//if(forcePrintSingle) $this.$emit("updatePrintedLabels", 'reset')
-					
-					
-					for (var i = 0; i < count; i++) {
-	
-						$this.$generatePDF($this.name, $this.grindType).then((result)=> $this.$print(result)).then(result2=>{
+
+					$this.$generatePDF($this.name, $this.grindType).then(async function(result){
+						var labels = [];
+						for (var i = 0; i < count; i++) {
+							labels.push(result);
 							
+						}
+						$this.$combinePDFs(labels).then((combinedPdfs) =>{
+
+						
+						$this.$print(combinedPdfs).then(()=>{
 							if(retailOrBulk === undefined) $this.$emit("updatePrintedLabels", $this.shortenedName);
 							resolve( $this.shortenedName);
-						}, fail=>{
-							reject('Error Printing ' +$this.labelFileName )
-							 alert('Error Printing ' +$this.labelFileName );
-							console.error($this.labelFileName)
-						});
-					}
+						})	
+
+						})
 					
+					});
 				}
-			
-			else{
-				resolve('')
-			}
-			
-		})
+				else{
+					resolve('')
+				}
+				
+			})
 		}
 	}
 };

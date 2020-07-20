@@ -4,7 +4,7 @@ import router from './router'
 import store from './store'
 
 Vue.prototype.$eventHub = new Vue();
-localStorage.clear();
+//localStorage.clear();
 
 
 var count = 0;
@@ -87,6 +87,8 @@ var checkIfPrintable = function(labelFileName){
 
 var combinePDFs= async function(pdfs){
 	// Create a new PDFDocument
+	return new Promise(async function(resolve, reject){
+
 	const pdfDoc = await PDFDocument.create()
 
 	var firstDonorPdfBytes;
@@ -105,7 +107,7 @@ var combinePDFs= async function(pdfs){
 		const pdfBytes = await pdfDoc.save();
 		var tempName = Date.now().toString()+".pdf";
 		fs.writeFile(tempName, pdfBytes, () => {
-			return tempName;
+			resolve(tempName);
 		});
 
 	} catch (err) {
@@ -113,7 +115,7 @@ var combinePDFs= async function(pdfs){
 		reject('fail')
 	}
 
-	
+	});
 }
 
 
@@ -121,6 +123,7 @@ var combinePDFs= async function(pdfs){
 	var printPDF = async function(pdfLocation){
 		var size;
 		var tempName = pdfLocation;
+		console.log("trying to print "+ pdfLocation)
 		return new Promise(async function(resolve, reject){
 			var existingPdfBytes
 			try{
@@ -137,7 +140,7 @@ var combinePDFs= async function(pdfs){
 				size = '5lb'
 
 		  
-				console.log("trying to print "+ pdfLocation)
+				
 			var print = spawn(
 				path.join(remote.app.getAppPath(), '..', 'PDFtoPrinter.exe'),
 				true ? [tempName, "Bulk Printer"]: [tempName, "Retail Printer"]
@@ -157,8 +160,8 @@ var combinePDFs= async function(pdfs){
 				console.debug(`child process exited with code ${code}`);
 			  });
 			} catch (err) {
-				console.error(err)
-				reject('fail')
+				alert('Error Printing ' +pdfLocation);
+				reject('Error Printing ' +pdfLocation )
 			}
 		});
 	

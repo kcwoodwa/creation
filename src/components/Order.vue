@@ -11,7 +11,8 @@
 		<Label
 			v-bind:key="name.toString()+item.name"
 			v-for="(item, index) in items"
-			:name="item.name"
+			:name='item && item.options[0] && (item.options[0].value == "Yes" || item.options[0].name == "Grind Options") ? 
+					item.name+" - " +item.options[0].value : item.name'
 			ref="Label"
 			:orderNumber="name.toString()"
 			:itemObject="item"
@@ -19,7 +20,10 @@
 			@hideOrder="hide"
 			@updatePrintedLabels="updatePrintedLabels"
 			:last="index === items.length-1"
-			:fileLocation="getFileLocations.getItem(item.name)"
+			:fileLocation='getFileLocations.getItem(
+				item && item.options[0] && (item.options[0].value == "Yes" || item.options[0].name == "Grind Options") ? 
+					item.name+" - " +item.options[0].value : item.name
+			)'
 			v-on="$listeners"
 		
 			:printedLabels="getPrintedLabelsFromShipstation()"
@@ -66,6 +70,9 @@ export default {
 	components: {
 		Label
 	},
+	created(){
+	
+	},
 	data() {
 		return {
 			md5sum: "",
@@ -78,12 +85,13 @@ export default {
 		//...mapGetters(['getFileLocations']),
 		getFileLocations:function(){
 			return this.$store.getters.getFileLocations
-		}
+		},
+		
 	
 	},
 
 	methods: {
-		printOrder: function(){console.log(4);this.$emit('printOrder',this)},
+		printOrder: function(){this.$emit('printOrder',this)},
 		...mapMutations(['unhide','setFileLocation']),
 		getPrintedLabelsFromShipstation: function() {
 			
@@ -98,6 +106,7 @@ export default {
 		},
 
 		hide: function() {
+			item.itemObject
 			this.hidden = true;
 		},
 		encryptThenAuthenticate: function(plainText) {
