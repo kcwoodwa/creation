@@ -204,9 +204,10 @@ export default {
               var functions;
               child.$children.forEach(async function(label){
                 if(self.$checkIfPrintable(label.name)){
-                  labelsToBePrinted.push(label);
-               
-                  namesOfLabels.push(label.name)
+                  for(var j =0; j< label.quantity; j++){
+                    labelsToBePrinted.push(label);
+                    namesOfLabels.push(label.name)
+                  }
                 }
                 functions=labelsToBePrinted.map((label)=>self.$generatePDF)
               }) 
@@ -222,7 +223,7 @@ export default {
                   // that eventually will resolve to a new array containing
                   // the value of the two promises
                   
-                  return accResult.concat(nextResult)
+                  return accResult.concat(nextResult) 
                 })
               })
             };

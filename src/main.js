@@ -22,17 +22,37 @@ import PromiseQueue from 'easy-promise-queue';
 
 
 
+
+
 Vue.prototype.$rootOfApp = path.join(remote.app.getAppPath(), '..');
 Vue.prototype.$showHidden = false;
 Vue.prototype.$queue = new PromiseQueue({concurrency: 1});
 
+var directory = path.join(Vue.prototype.$rootOfApp, 'tempPDFs')
+fs.readdir(directory, (err, files) => {
+	if (err) throw err;
+  
+	for (const file of files) {
+	  fs.unlink(path.join(directory, file), err => {
+		if (err) throw err;
+	  });
+	}
+  });
+
 var url ;
 	var fontBytes;
+
+	fontBytes = fs.readFileSync('fonts/Gotham-Book.ttf');
+	//fontBytes = fontkit.create(fontData);
+	//var junction_font = new FontFace('Junction Regular', 'url(fonts/Gotham Extra Light.otf)');
 
 const request = async () => {
 	
     url = "https://raw.githubusercontent.com/mapzen/open/master/assets/fonts/Gotham-Light.ttf";
-	fontBytes = await fetch(url).then(res => res.arrayBuffer());
+	//fontBytes = await fetch(url).then(res => res.arrayBuffer());
+	//fontBytes = junction_font;
+	
+
 }
 
 request();
@@ -105,7 +125,7 @@ var combinePDFs= async function(pdfs){
 
 		}
 		const pdfBytes = await pdfDoc.save();
-		var tempName = Date.now().toString()+".pdf";
+		var tempName = path.join('tempPDFs',Date.now().toString()+".pdf");
 		fs.writeFile(tempName, pdfBytes, () => {
 			resolve(tempName);
 		});
@@ -184,6 +204,7 @@ var combinePDFs= async function(pdfs){
 		// Load a PDFDocument require( the existing PDF bytes
 	  
 		const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
 	  
 		pdfDoc.registerFontkit(fontkit);
 
@@ -194,6 +215,7 @@ var combinePDFs= async function(pdfs){
 	const customFont = await pdfDoc.embedFont(fontBytes);
 	var page = pdfDoc.getPages()[0]
 	const {width, height} = pdfDoc.getPages()[0].getSize()
+
 
 
 	var size;
@@ -208,7 +230,7 @@ var combinePDFs= async function(pdfs){
 		){
   
   
-	var color = rgb(35/256.0, 35/256.0, 35/256.0);
+	var color = rgb(51/256.0, 51/256.0, 51/256.0);
 	if (labelFileName.includes('Decaf') ||
 	  labelFileName.includes('Kiunyu') ||
 	  labelFileName.includes('Javacology House Blend') ||
@@ -364,7 +386,7 @@ var combinePDFs= async function(pdfs){
 	
 	const pdfBytes = await pdfDoc.save();
 
-		var tempName = labelFileName+Date.now().toString()+".pdf";
+		var tempName = path.join('tempPDFs',labelFileName+Date.now().toString()+".pdf");
 		fs.writeFile(tempName, pdfBytes, () => {
 			console.log(tempName)
 			resolve(tempName)
