@@ -20,6 +20,16 @@ import { PDFDocument, rgb } from "pdf-lib";
 
 import PromiseQueue from 'easy-promise-queue';
 
+import { spawn } from "child_process";
+import { hostname } from 'os';
+
+var networkPrint = false;
+if(hostname().includes('SHIPSTATION'))
+ networkPrint =true; 
+
+ 
+
+
 
 
 Vue.prototype.$rootOfApp = path.join(remote.app.getAppPath(), '..');
@@ -54,7 +64,7 @@ for (let i = 1; i < rows.length; i++) {
 Vue.prototype.$inventory = inventory
  */
 
-import { spawn } from "child_process";
+
 
 var checkIfPrintable = function(labelFileName){
 	var local = localStorage.getItem(labelFileName)
@@ -106,6 +116,7 @@ var combinePDFs= async function(pdfs){
 		}
 		const pdfBytes = await pdfDoc.save();
 		var tempName = Date.now().toString()+".pdf";
+		tempName = tempName.replace(/[\\\/:\*\?"<>\|]/g, "").trim()
 		fs.writeFile(tempName, pdfBytes, () => {
 			resolve(tempName);
 		});
@@ -140,10 +151,11 @@ var combinePDFs= async function(pdfs){
 				size = '5lb'
 
 		  
-				
+			var printer = networkPrint ? "\\\\SHIPSTATIONPC\\" : '';
+
 			var print = spawn(
 				path.join(remote.app.getAppPath(), '..', 'PDFtoPrinter.exe'),
-				true ? [tempName, "Bulk Printer"]: [tempName, "Retail Printer"]
+				true ? [tempName, printer+"Color Label 500"]: [tempName, printer+"2.5x3 Color Lable 2000"]
 			  );
 		  
 			  print.stdout.on("data", data => {
@@ -365,6 +377,7 @@ var combinePDFs= async function(pdfs){
 	const pdfBytes = await pdfDoc.save();
 
 		var tempName = labelFileName+Date.now().toString()+".pdf";
+		tempName = tempName.replace(/[\\\/:\*\?"<>\|]/g, "").trim()
 		fs.writeFile(tempName, pdfBytes, () => {
 			console.log(tempName)
 			resolve(tempName)
