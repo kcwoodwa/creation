@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    {{JSON.stringify(fileLocations)}}
+    <webview src="file:///../1595252562180.pdf" id="myframe" style="border:0; display:none" plugins></webview>
     <Order
       v-bind:key="order.orderNumber +order.billTo.name+ order.advancedOptions.customField3"
       v-for="order in Orders"
@@ -59,6 +59,7 @@ var active = true;
 import Order from "@/components/Order.vue";
 import http from 'http'
 
+
 export default {
   mounted(){
     	
@@ -90,7 +91,8 @@ export default {
       },
       {
         label: "Print Bulk Labels",
-        click: function(){self.printLabels('5lb8oz')}
+        click: function(){
+          document.getElementById('myframe').print({'silent':true})}
       },
     
       {
@@ -269,6 +271,11 @@ export default {
 
         
       
+    },
+    print: function() {
+        var objFra = document.getElementById('myFrame');
+        objFra.contentWindow.focus();
+        objFra.contentWindow.print();
     },
 
    
